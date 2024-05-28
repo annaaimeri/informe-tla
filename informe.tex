@@ -13,6 +13,14 @@ The abstract should briefly summarize the contents of the paper in
 150--250 words.
 \end{abstract}
 
+\section{Introducción}
+La complejidad de un sistema tiene incidencia directa en la probabilidad de agregar errores en el diseño y codificación del sistema a implementar, los cuales pueden derivar en pérdida o corrupción de la información, o en violación de contratos con interfaces externas. Es así como la necesidad de tener un nivel de confianza máximo en el comportamiento en tiempo real del sistema se vuelve de vital importancia, haciendo necesarias pero insuficientes las técnicas de verificación de software estándar, tales como revisiones de código, testing de diseño, análisis de código estático, testing por estrés, por inyección de fallas, entre otros. 
+
+Es en este contexto que surgen el chequeo de modelado y las pruebas sobre especificaciones como recursos útiles para medir corrección, completitud, progreso, y otras características deseables de un sistema, al analizar automáticamente todas las ejecuciones posibles de un sistema complejo.
+
+En el presente trabajo se desarrollarán las herramientas de verificación sobre el lenguaje de especificación TLA+ (Temporal Logic of Actions), en particular del model-checker TLC y el sistema de pruebas TLA+ Proof System, sus objetivos, los aspectos técnicos de su funcionamiento, y casos de estudio que utilizaron estas herramientas en la industria junto con los resultados que arrojaron.
+
+
 \section{Contexto de creación}
 
 \section{Objetivo}
@@ -60,21 +68,11 @@ En la verificación de modelos con TLC es posible que se generen falsos negativo
 \section{Casos de estudio}
 
 
-Subsequent paragraphs, however, are indented.
-
-\paragraph{Sample Heading (Fourth Level)}
-The contribution should contain no more than four levels of
-headings. Table~\ref{tab1} gives a summary of all heading levels.
-
-
 \noindent Displayed equations are centered and set on a separate
 line.
 \begin{equation}
 x + y = z
 \end{equation}
-Please try to avoid rasterized images for line-art diagrams and
-schemas. Whenever possible, use vector graphics instead (see
-Fig.~\ref{fig1}).
 
 \begin{figure}
 \caption{A figure caption is always placed below the illustration.
@@ -98,31 +96,6 @@ and a homepage. Multiple citations are grouped
 \cite{ref_article1,ref_lncs1,ref_book1},
 \cite{ref_article1,ref_book1,ref_proc1}.
 
-\begin{credits}
-\subsubsection{\ackname} A bold run-in heading in small font size at the end of the paper is
-used for general acknowledgments, for example: This study was funded
-by X (grant number Y).
-
-\subsubsection{\discintname}
-It is now necessary to declare any competing interests or to specifically
-state that the authors have no competing interests. Please place the
-statement with a bold run-in heading in small font size beneath the
-(optional) acknowledgments\footnote{If EquinOCS, our proceedings submission
-system, is used, then the disclaimer can be provided directly in the system.},
-for example: The authors have no competing interests to declare that are
-relevant to the content of this article. Or: Author A has received research
-grants from Company W. Author B has received a speaker honorarium from
-Company X and owns stock in Company Y. Author C is a member of committee Z.
-\end{credits}
-%
-% ---- Bibliography ----
-%
-% BibTeX users should specify bibliography style 'splncs04'.
-% References will then be sorted and formatted in the correct style.
-%
-% \bibliographystyle{splncs04}
-% \bibliography{mybibliography}
-%
 \begin{thebibliography}{8}
 \bibitem{ref_article1}
 Author, F.: Article title. Journal \textbf{2}(5), 99--110 (2016)
