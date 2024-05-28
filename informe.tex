@@ -1,6 +1,9 @@
 \documentclass[runningheads]{llncs}
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{multirow}
 
 \begin{document}
 \title{TLA+}
@@ -66,35 +69,83 @@ En la verificación de modelos con TLC es posible que se generen falsos negativo
 \textbf{(FALTA TLAPS)}
 
 \section{Casos de estudio}
+\subsection{Amazon}
+TLA+ se utilizó en Amazon Web Services (AWS) para corregir errores y mejorar la fiabilidad del sistema mediante especificación formal y verificación de modelos. En este caso, un desarrollador utilizó TLA+ para abordar un error sutil en un algoritmo que había pasado desapercibido a través de múltiples revisiones de diseño y código. A pesar de meses de pruebas, el error surgió sólo después de que el desarrollador escribiera una especificación en TLA+ y la ejecutara en el verificador de modelos TLC, que identificó rápidamente el problema. Esta detección exitosa de errores destacó la efectividad de TLA+ para descubrir defectos ocultos que los métodos de prueba tradicionales podrían pasar por alto.
 
+La fortaleza de TLA+ radica en su capacidad para describir tanto las propiedades de corrección deseadas del sistema (el 'qué') como el diseño del sistema (el 'cómo'). Esto permite a los desarrolladores no solo verificar la corrección del sistema, sino también comprender su funcionamiento interno y realizar optimizaciones de rendimiento sin sacrificar la corrección. Debido al gran volumen de procesos que se realizan en los servidores de AWS, garantizar un código con la menor cantidad de bugs posible es esencial. Aunque un bug pueda parecer poco probable y tener una probabilidad de ocurrencia muy baja, la enorme cantidad de transacciones que se realizan diariamente hace que incluso estos casos poco probables puedan surgir. Por lo tanto, la capacidad de TLA+ para detectar y corregir incluso los errores más sutiles se vuelve crítica en un entorno donde la fiabilidad y la precisión son imperativas.
 
-\noindent Displayed equations are centered and set on a separate
-line.
+Además, el éxito del uso de TLA+ para rectificar errores llevó a la dirección de AWS a abogar por su adopción en otros equipos que trabajaban en algoritmos y características críticas dentro del servicio S3. Los desarrolladores escribieron especificaciones formales para algoritmos adicionales y nuevas características, con el verificador de modelos ayudando a verificar las correcciones y prevenir la introducción de nuevos errores. La capacidad de enseñar rápidamente TLA+ a desarrolladores nuevos en la herramienta fue crucial para escalar su adopción dentro de la organización, demostrando su valor en mejorar la calidad del sistema y prevenir que errores graves lleguen a producción.
+
+En la tabla 1 obtenida del paper podemos ver en qué sistemas dentro de AWS fue usado TLA+, y cómo le fue beneficioso:
+
+\begin{table}
+    \caption{Aplicaciones de TLA+ en Amazon.}\label{tab1}
+    \setlength{\tabcolsep}{2pt} % Adjust column separation
+    \begin{tabular}{|p{4.5em}|p{11em}|p{6em}|p{15em}|}
+    \hline
+    Sistema & Componentes & Cantidad de líneas & Beneficio\\
+    \hline
+    \multirow{2}{*}{S3} & Fault-tolerant low-level network algorithm & 804 PlusCal & Found 2 bugs. Found further bugs in proposed optimizations.\\
+    \cline{2-4}
+     & Background redistribution of data & 645 PlusCal & Found 1 bug, and found a bug in the first proposed fix.\\
+    \hline
+    \parbox{4em}{Dynamo DB} & Replication \& group & 939 TLA+ & Found 3 bugs, some requiring traces of 35 steps\\
+    \hline
+    EBS & Volume management & 102 PlusCal & Found 3 bugs.\\
+    \hline
+    \multirow{2}{*}{\parbox{4em}{Internal distributed\\lock manager}} & Lock-free data structure & 223 PlusCal & Improved confidence. Failed to find a liveness bug as we did not check liveness.\\
+    \cline{2-4}
+     & Fault tolerant replication and reconfiguration algorithm & 318 TLA+ & Found 1 bug. Verified an aggressive optimization. \\
+    \hline
+    \end{tabular}
+\end{table}
+ 
+\subsection{Elasticsearch}
+En la versión 6.2 de ElasticSearch se detectó un bug que dejaba documentos borrados sin eliminar accesibles si se tenía acceso seguro, un valor booleano compartido, al momento de la operación, y el sistema de mapeo de versiones era vulnerable a cambios en este valor que permitía leer el documento eliminado. De modo que fueron reportados casos por usuarios que encontraron documentos con la misma clave primaria, tras hacer llamadas a sus APIs de indexación y eliminación de documentos consecutivamente. 
+
+Estos casos fueron detectados por TLC en un modelo formal realizado por los propios desarrolladores del sistema de indexación y eliminación de documentos replicados. Pudieron solucionar el problema eliminando estos documentos cuando hayan sido re-indexados, sin importar la condición del valor de acceso seguro. Con esto pudieron pasar las pruebas de TLC sobre terminación del proceso
+
 \begin{equation}
-x + y = z
+    Terminated \triangleq \forall self \in ProcSet: pc[self] = "Done"
 \end{equation}
 
-\begin{figure}
-\caption{A figure caption is always placed below the illustration.
-Please note that short captions are centered, while long ones are
-justified by the macro package automatically.} \label{fig1}
-\end{figure}
+Y el invariante de unicidad de documentos
+\begin{align*}
+    & Invariant \triangleq Terminated \implies \\
+    & \land expected\_doc = NULL \implies lucene\_document = NULL \\ 
+    & \land expected\_doc \neq NULL \implies lucene\_document.content = expected\_doc
+\end{align*}
 
-\begin{theorem}
-This is a sample theorem. The run-in heading is set in bold, while
-the following text appears in italics. Definitions, lemmas,
-propositions, and corollaries are styled the same way.
-\end{theorem}
+\subsection{Prueba de un algoritmo tolerante a demoras y fallas de renombre de procesos}
+En el marco de la computación paralela, se ha realizado un trabajo de análisis y verificación de un algoritmo no bloqueante y tolerante a fallas de renombre de procesos en un sistema de memoria compartido. Esto permite probar propiedades de safety y liveness sobre el sistema. En particular se probó la siguiente propiedad de corrección, 
+\begin{equation}
+    \forall p, que \in Proc, p \neq q, \square(name_p \neq \bot \land name_q \neq \bot \implies name_p \neq name_q)
+\end{equation}
 
-For citations of references, we prefer the use of square brackets
-and consecutive numbers. Citations using labels or the author/year
-convention are also acceptable. The following bibliography provides
-a sample reference list with entries for journal
-articles~\cite{ref_article1}, an LNCS chapter~\cite{ref_lncs1}, a
-book~\cite{ref_book1}, proceedings without editors~\cite{ref_proc1},
-and a homepage. Multiple citations are grouped
-\cite{ref_article1,ref_lncs1,ref_book1},
-\cite{ref_article1,ref_book1,ref_proc1}.
+que cada proceso obtiene un nombre único, y la siguiente propiedad de terminación,
+\begin{equation}
+    \forall p \in Proc, \square(\text{p enters the renaming} \implies \lozenge (\text{name}_p \neq \bot))
+\end{equation}
+
+que cada proceso que entra al sistema obtiene un nombre.
+Además se proveen las pruebas pertinentes de corrección y completitud de los splitters, objetos que se utilizan para la sincronización de acciones sin bloqueo,  las cuales son
+
+\[
+\square \left( \begin{aligned}
+    &\phantom{\land} \forall p,q \in \text{Proc}, \phantom{\land} \text{dir}_p = \text{stop} \land \text{dir}_q = \text{stop} \implies p = q \\
+    &\land \exists p \in \text{Proc}, \text{dir}_p \neq \text{right} \\
+    &\land \exists p \in \text{Proc}, \text{dir}_p \neq \text{down}
+\end{aligned} \right)
+\]
+y
+
+\[
+    \forall p \in Proc, \square(p\ entra\ al\ splitter \implies \lozenge(dir_p \in \{stop, down, right\})))    
+\]
+
+respectivamente.
+El modelo y prueba de estas propiedades consisten en 2000 líneas de TLAPS para el algoritmo, y 200 líneas por el splitter, con un total de 70 lemas y teoremas, y 963 pasos de prueba. Las pruebas del splitter consisten en 93 obligaciones de prueba, entre ellas 43 obvias y descartadas por TLAPM (el manejador de pruebas de TLA+), y las otras 50 resueltas con motores de prueba SMT (CVC3, VeriT y Z3 fueron usados).
+
 
 \begin{thebibliography}{8}
 \bibitem{ref_article1}
