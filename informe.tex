@@ -5,6 +5,7 @@
 \usepackage{amssymb}
 \usepackage{multirow}
 \usepackage{url}
+\usepackage[spanish,es-tabla]{babel}
 
 \begin{document}
 \title{TLA+}
@@ -82,7 +83,7 @@ La fortaleza de TLA+ radica en su capacidad para describir tanto las propie-\\da
 
 Además, el éxito del uso de TLA+ para rectificar errores llevó a la dirección de AWS a abogar por su adopción en otros equipos que trabajaban en algoritmos y características críticas dentro del servicio S3. Los desarrolladores escribieron especificaciones formales para algoritmos adicionales y nuevas características, con el verificador de modelos ayudando a verificar las correcciones y prevenir la introducción de nuevos errores. La capacidad de enseñar rápidamente TLA+ a desarrolladores nuevos en la herramienta fue crucial para escalar su adopción dentro de la organización, demostrando su valor en mejorar la calidad del sistema y prevenir que errores graves lleguen a producción.
 
-En la tabla \ref{tab1} obtenida del paper podemos ver en qué sistemas dentro de AWS fue usado TLA+, y cómo le fue beneficioso:
+En la tabla \ref{tab1} obtenida del paper podemos ver en qué sistemas dentro de AWS fue usado TLA+, y cómo le fue beneficioso.
 
 \begin{table}
     \caption{Aplicaciones de TLA+ en Amazon.}\label{tab1}
@@ -135,7 +136,7 @@ Y el invariante de unicidad de documentos
 \subsection{Prueba de un algoritmo tolerante a demoras y fallas de renombre de procesos}
 En el marco de la computación paralela, se ha realizado un trabajo \cite{case_study} de análisis y verificación de un algoritmo no bloqueante y tolerante a fallas de renombre de procesos en un sistema de memoria compartido. Esto permite probar propiedades de safety y liveness sobre el sistema. En particular se probó la siguiente propiedad de corrección, 
 \begin{equation}
-    \forall p, que \in Proc, p \neq q, \square(name_p \neq \bot \land name_q \neq \bot \implies name_p \neq name_q)
+    \forall p, q \in Proc, p \neq q, \square(name_p \neq \bot \land name_q \neq \bot \implies name_p \neq name_q)
 \end{equation}
 
 que cada proceso obtiene un nombre único, y la siguiente propiedad de terminación,
