@@ -72,7 +72,9 @@ En la verificación de modelos con TLC es posible que se generen falsos negativo
 
 \section{Casos de estudio}
 \subsection{Intel}
-\cite{tla}
+En Intel, TLA+ y TLC se han utilizado para diseñar y verificar protocolos de coherencia de caché en procesadores multinúcleo, en particular para los procesadores Alpha EV7 y EV8. En particular para el proyecto del EV8, la especificación fue completada antes de que el diseño fuera estable, lo que brindó feedback a los diseñadores.
+
+TLA+ facilita la exploración de optimizaciones y modificaciones del protocolo, permitiendo iteraciones rápidas y evaluaciones de su impacto en la complejidad del estado. La experiencia de los ingenieros de Intel muestra que TLA+ es una herramienta poderosa para encontrar errores y mejorar la eficiencia de los diseños complejos en etapas tempranas del desarrollo. \cite{tla}
 
 \subsection{Amazon}
 TLA+ se utilizó en Amazon Web Services (AWS) \cite{amazon} para corregir errores y mejorar la fiabilidad del sistema mediante especificación formal y verificación de modelos. En este caso, un desarrollador utilizó TLA+ para abordar un error sutil en un algoritmo que había pasado desapercibido a través de múltiples revisiones de diseño y código. A pesar de meses de pruebas, el error surgió sólo después de que el desarrollador escribiera una especificación en TLA+ y la ejecutara en el verificador de modelos TLC, que identificó rápidamente el problema. Esta detección exitosa de errores destacó la efectividad de TLA+ para descubrir defectos ocultos que los métodos de prueba tradicionales podrían pasar por alto.
@@ -83,7 +85,7 @@ La fortaleza de TLA+ radica en su capacidad para describir tanto las propie-\\da
 
 Además, el éxito del uso de TLA+ para rectificar errores llevó a la dirección de AWS a abogar por su adopción en otros equipos que trabajaban en algoritmos y características críticas dentro del servicio S3. Los desarrolladores escribieron especificaciones formales para algoritmos adicionales y nuevas características, con el verificador de modelos ayudando a verificar las correcciones y prevenir la introducción de nuevos errores. La capacidad de enseñar rápidamente TLA+ a desarrolladores nuevos en la herramienta fue crucial para escalar su adopción dentro de la organización, demostrando su valor en mejorar la calidad del sistema y prevenir que errores graves lleguen a producción.
 
-En la tabla \ref{tab1} obtenida del paper podemos ver en qué sistemas dentro de AWS fue usado TLA+, y cómo le fue beneficioso.
+En la Tabla \ref{tab1} obtenida del paper podemos ver en qué sistemas dentro de AWS fue usado TLA+, y cómo le fue beneficioso.
 
 \begin{table}
     \caption{Aplicaciones de TLA+ en Amazon.}\label{tab1}
