@@ -76,7 +76,9 @@ En la verificación de modelos con TLC es posible que se generen falsos negativo
 \subsection{Amazon}
 TLA+ se utilizó en Amazon Web Services (AWS) \cite{amazon} para corregir errores y mejorar la fiabilidad del sistema mediante especificación formal y verificación de modelos. En este caso, un desarrollador utilizó TLA+ para abordar un error sutil en un algoritmo que había pasado desapercibido a través de múltiples revisiones de diseño y código. A pesar de meses de pruebas, el error surgió sólo después de que el desarrollador escribiera una especificación en TLA+ y la ejecutara en el verificador de modelos TLC, que identificó rápidamente el problema. Esta detección exitosa de errores destacó la efectividad de TLA+ para descubrir defectos ocultos que los métodos de prueba tradicionales podrían pasar por alto.
 
-La fortaleza de TLA+ radica en su capacidad para describir tanto las propiedades de corrección deseadas del sistema (el 'qué') como el diseño del sistema (el 'cómo'). Esto permite a los desarrolladores no solo verificar la corrección del sistema, sino también comprender su funcionamiento interno y realizar optimizaciones de rendimiento sin sacrificar la corrección. Debido al gran volumen de procesos que se realizan en los servidores de AWS, garantizar un código con la menor cantidad de bugs posible es esencial. Aunque un bug pueda parecer poco probable y tener una probabilidad de ocurrencia muy baja, la enorme cantidad de transacciones que se realizan diariamente hace que incluso estos casos poco probables puedan surgir. Por lo tanto, la capacidad de TLA+ para detectar y corregir incluso los errores más sutiles se vuelve crítica en un entorno donde la fiabilidad y la precisión son imperativas.
+% Amigos miren como separe el propiedades para forzar un salto de línea
+% es horrible pero no se por que se buggea y no salta automaticamente
+La fortaleza de TLA+ radica en su capacidad para describir tanto las propie-\\dades de corrección deseadas del sistema (el 'qué') como el diseño del sistema (el 'cómo'). Esto permite a los desarrolladores no solo verificar la corrección del sistema, sino también comprender su funcionamiento interno y realizar optimizaciones de rendimiento sin sacrificar la corrección. Debido al gran volumen de procesos que se realizan en los servidores de AWS, garantizar un código con la menor cantidad de bugs posible es esencial. Aunque un bug pueda parecer poco probable y tener una probabilidad de ocurrencia muy baja, la enorme cantidad de transacciones que se realizan diariamente hace que incluso estos casos poco probables puedan surgir. Por lo tanto, la capacidad de TLA+ para detectar y corregir incluso los errores más sutiles se vuelve crítica en un entorno donde la fiabilidad y la precisión son imperativas.
 
 Además, el éxito del uso de TLA+ para rectificar errores llevó a la dirección de AWS a abogar por su adopción en otros equipos que trabajaban en algoritmos y características críticas dentro del servicio S3. Los desarrolladores escribieron especificaciones formales para algoritmos adicionales y nuevas características, con el verificador de modelos ayudando a verificar las correcciones y prevenir la introducción de nuevos errores. La capacidad de enseñar rápidamente TLA+ a desarrolladores nuevos en la herramienta fue crucial para escalar su adopción dentro de la organización, demostrando su valor en mejorar la calidad del sistema y prevenir que errores graves lleguen a producción.
 
@@ -114,11 +116,21 @@ Estos casos fueron detectados por TLC en un modelo formal realizado por los prop
 \end{equation}
 
 Y el invariante de unicidad de documentos
-\begin{align*}
-    & Invariant \triangleq Terminated \implies \\
-    & \land expected\_doc = NULL \implies lucene\_document = NULL \\ 
-    & \land expected\_doc \neq NULL \implies lucene\_document.content = expected\_doc
-\end{align*}
+% \begin{align*}
+%     & Invariant \triangleq Terminated \implies \\
+%     & \land expected\_doc = NULL \implies lucene\_document = NULL \\ 
+%     & \land expected\_doc \neq NULL \implies lucene\_document.content = expected\_doc
+% \end{align*}
+% Dejo esto que me compiló en overleaf pero no tengo el compilador asi que comentado
+% esta como estaba antes jiij
+\[
+\begin{aligned}
+    &Invariant \triangleq Terminated \implies \\
+    &\phantom{Inv} \land expected\_doc = NULL \implies lucene\_document = NULL \\ 
+    &\phantom{Inv} \land expected\_doc \neq NULL \implies lucene\_document.content = expected\_doc
+\end{aligned}
+\]
+
 
 \subsection{Prueba de un algoritmo tolerante a demoras y fallas de renombre de procesos}
 En el marco de la computación paralela, se ha realizado un trabajo \cite{case_study} de análisis y verificación de un algoritmo no bloqueante y tolerante a fallas de renombre de procesos en un sistema de memoria compartido. Esto permite probar propiedades de safety y liveness sobre el sistema. En particular se probó la siguiente propiedad de corrección, 
