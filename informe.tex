@@ -14,8 +14,7 @@
 \maketitle              % typeset the header of the contribution
 %
 \begin{abstract}
-The abstract should briefly summarize the contents of the paper in
-150--250 words.
+Presentamos un set de herramientas sobre el lenguaje de especificación de modelos TLA+, que nos permite corregir el diseño de un sistema mediante la especificación de un modelo, y demostrar propiedades sobre sus comportamientos posibles mediante el uso de motores de prueba sobre lógica temporal de acciones. Desarrollaremos características de la interfaz de usuario, el mecanismo de chequeo del modelo y especificaciones,  y casos de aplicación en la industria por grandes tecnológicas, desde procesos de sistemas operativos en tiempo real hasta sistemas de almacenamiento distribuidos.
 \end{abstract}
 
 \section{Introducción}
@@ -29,8 +28,9 @@ En el presente trabajo se desarrollarán las herramientas de verificación sobre
 \section{Contexto de creación}
 
 \section{Objetivo}
-TLA+ es un lenguaje de especificación formal multi-propósito particularmente útil para describir sistemas distribuidos y concurrentes. Se trata de un lenguaje declarativo, jerárquico, y escalable a especificaciones de grandes sistemas, que provee una abstracción consistente sobre varios verificadores como backend. 
-Las propiedades que TLA+ puede chequear son condiciones sobre ejecuciones individuales. Además permite verificar invariantes sobre comportamientos válidos tales como fairness y algunas propiedades de lógica temporal básica que respondan a características de safety y liveness.
+TLA+ es un lenguaje de especificación formal multi-propósito particularmente útil para describir sistemas distribuidos y concurrentes. Se trata de un lenguaje declarativo, jerárquico, y escalable a especificaciones de grandes sistemas, que provee una abstracción consistente sobre varios motores de prueba como backend. 
+
+Las propiedades que TLA+ puede chequear son condiciones sobre ejecuciones individuales. Además permite verificar invariantes sobre comportamientos válidos tales como algunas propiedades de lógica temporal básica que respondan a características de safety y liveness, pudiendo asumir condiciones como fairness débil o fuerte sobre acciones.
 
 Dado que el objetivo de la herramienta es especificar propiedades sobre las variables libres del modelo, es utilizado principalmente en la etapa de arquitectura y diseño del software, una vez que se cuenta con la especificación y antes de codificar la implementación. A su vez, es posible apoyarse en la herramienta para derivar casos de tests, dado que un diseño certero del modelo nos provee el conjunto de propiedades a verificar para nuestra implementación.
 
@@ -41,15 +41,18 @@ El lenguaje de especificación de modelos TLA+ es un lenguaje formal que combina
 
 El lenguaje de propiedades de TLA+ se basa en la lógica de acciones temporales (TLA). Esta lógica combina la lógica temporal con una lógica de acciones, proporcionando constructores que incluyen predicados sobre estados iniciales, relaciones de transición entre estados sucesivos y condiciones de fairness para garantizar un progreso adecuado en el sistema.
 
-TLA+ permite realizar un análisis exhaustivo de propiedades críticas, como la detección de deadlocks, y el análisis de progreso, garantizando que el sistema avance hacia estados deseados. Además, TLA+ facilita la verificación de invariantes, propiedades que deben mantenerse verdaderas en todos los estados alcanzables del sistema, a través de fórmulas especificadas en los archivos de configuración. También permite el control de fairness, mediante la conjunción de fórmulas temporales que definen las condiciones de liveness del sistema. Los análisis se realizan evaluando predicados de estado inicial y acciones de siguiente estado especificadas, utilizando evaluaciones para eliminar posibles transiciones o estados, garantizando una revisión completa y precisa del comportamiento del sistema bajo diferentes condiciones. Además, es posible con TLA+ formular teoremas y diseñar pruebas formales de estos en TLAPS. (\textbf{AGREGAR MAS SOBRE TLAPS)}
+TLA+ permite realizar un análisis exhaustivo de propiedades críticas, como la detección de deadlocks, y el análisis de progreso, garantizando que el sistema avance hacia estados deseados. Además, TLA+ facilita la verificación de invariantes, propiedades que deben mantenerse verdaderas en todos los estados alcanzables del sistema, a través de fórmulas especificadas en los archivos de configuración. También permite el control de fairness, mediante la conjunción de fórmulas temporales que definen las condiciones de liveness del sistema. (\textbf{EJEMPLO: esquema basico de especificacion en TLA}). Los análisis se realizan evaluando predicados de estado inicial y acciones de siguiente estado especificadas, utilizando evaluaciones para eliminar posibles transiciones o estados, garantizando una revisión completa y precisa del comportamiento del sistema bajo diferentes condiciones. 
 
-Los modelos en TLA+ y su verificación en TLC ponen su foco en el comportamiento del sistema, abstrayéndose de los detalles de su implementación. Es por esto que son independientes de cualquier lenguaje de programación, y no es necesario anotar el programa. Sin embargo, es posible anotar el algoritmo usando el pseudo-código PlusCal, un lenguaje formal que se transpila a TLA+. A diferencia del enfoque orientado a acciones, PlusCal se asemeja más a un lenguaje de programación imperativo y es más adecuado para especificar algoritmos secuenciales.
+Además, es posible con TLA+ formular teoremas y diseñar pruebas formales sobre propiedades de estas especificaciones en TLAPS. (\textbf{AGREGAR MAS SOBRE TLAPS)}
 
-TLC visualiza los errores en las especificaciones de TLA+ proporcionando informes detallados cuando encuentra la violación de alguna propiedad. Cuando TLC detecta que una de las propiedades que está verificando no se cumple, procede a reportar un contraejemplo que ilustra cómo el sistema llega a un estado en el que esa propiedad es violada. A continuación, TLC genera una traza que lleva al estado donde se produce la violación, representando cada estado como un predicado TLA+ que describe sus condiciones, y permite visualizar la evolución del sistema hasta llegar al estado problemático. Esta traza se minimiza para ofrecer una representación concisa pero informativa del problema. 
+Los modelos en TLA+ y su verificación en TLC ponen su foco en el comportamiento del sistema, abstrayéndose de los detalles de su implementación. Es por esto que son independientes de cualquier lenguaje de programación, y no es necesario anotar el programa. Sin embargo, es posible anotar el algoritmo usando el pseudo-código PlusCal, un lenguaje formal que se transpila a TLA+, para probar propiedades sobre sus variables. A diferencia del enfoque orientado a acciones, PlusCal se asemeja más a un lenguaje de programación imperativo y es más adecuado para especificar algoritmos secuenciales. (\textbf{EJEMPLO: snippet en PlusCal}).
+
+TLC visualiza los errores en las especificaciones de TLA+ proporcionando informes detallados cuando encuentra la violación de alguna propiedad. Cuando TLC detecta que una de las propiedades que está verificando no se cumple, procede a reportar un contraejemplo que ilustra cómo el sistema llega a un estado en el que esa propiedad es violada, a partir de un comportamiento válido segun la especificación. A continuación, TLC genera una traza que lleva al estado donde se produce la violación, representando cada estado como un predicado TLA+ que describe sus condiciones, y permite visualizar la evolución del sistema hasta llegar al estado problemático. Esta traza se minimiza para ofrecer una representación concisa pero informativa del problema. 
 
 Los errores más difíciles de localizar son aquellos que TLC detecta al evaluar una expresión que no puede manejar o que produce un resultado no válido según la semántica de TLA+. TLC imprime la ubicación del error, indicando las expresiones anidadas que estaban siendo evaluadas cuando ocurrió el problema. A menudo, el reporte del error no es tan específico como se desearía, por lo que a veces es necesario insertar expresiones de impresión adicionales para localizar el problema con mayor precisión.
 
 El verificador de modelos TLC permite la simulación de comportamientos del sistema. En modo de simulación, TLC construye y verifica repetidamente comportamientos individuales con una longitud máxima fija.
+
 Para crear y verificar un comportamiento, TLC sigue un procedimiento similar al de construir el grafo G (\textbf{CUIDADO:} Acá hablamos del “grafo g” antes de definirlo), pero con una diferencia clave; después de calcular el conjunto de estados iniciales y el conjunto de sucesores para un estado dado, TLC elige pseudo-aleatoriamente un elemento de ese conjunto. Si el elemento no cumple con la restricción especificada, TLC detiene la computación de G. De lo contrario, TLC incluye ese estado en G y verifica las fórmulas de invarianza para ese estado. La construcción de G se detiene cuando se genera el número máximo especificado de estados.
 
 \section{Aspectos técnicos}
@@ -164,6 +167,19 @@ y
 
 respectivamente.
 El modelo y prueba de estas propiedades consisten en 2000 líneas de TLAPS para el algoritmo, y 200 líneas por el splitter, con un total de 70 lemas y teoremas, y 963 pasos de prueba. Las pruebas del splitter consisten en 93 obligaciones de prueba, entre ellas 43 obvias y descartadas por TLAPM (el manejador de pruebas de TLA+), y las otras 50 resueltas con motores de prueba SMT (CVC3, VeriT y Z3 fueron usados).
+
+\section{Caso de aplicación de la herramienta}
+A continuación desarrollamos un caso de aplicación completo donde podemos ver cómo se utiliza TLA+ y su verificador TLC para encontrar un bug en un proceso concurrente real.
+
+Se trata de un modelo de gestor de tareas, creado por el desarrollador Andreas Stührk para la empresa donde trabaja. El mismo debe mantener actualizado el estado de realización de los trabajos encomendados, y encargarse de la realización concurrente de las mismas. El sistema tenía un bug de consistencia en el supervisor de trabajos, y es que a veces no se percibía el cambio de ‘pendiente’ a ‘completo’ correctamente. Por lo que se desarrolló la especificación de las partes del sistema existente con TLA+, particularmente usando su lenguaje de pseudocódigo asociado PlusCal también, y fueron chequeadas invariantes de correctitud y progreso con TLC.
+
+Cada trabajo consiste en la completitud de tareas independientes. El sistema consiste de un supervisor de progreso, que toma los mensajes de status de tareas de una cola FIFO conectada a las unidades de procesamiento y decide si el trabajo está completo, y guarda la información del progreso en nodos en una unidad de almacenamiento (Cassandra). Esta unidad implementa factores de replicación y niveles de consistencia para asegurar que los datos sean replicados y leídos de manera confiable entre múltiples nodos. En la figura 1 se puede ver un diagrama de la arquitectura del sistema. 
+
+\begin{figure}[t]
+    \caption{Arquitectura del sistema gestor de tareas.}\label{sistema}
+    \includegraphics[width=8cm]{formalizing-the-system.png}
+    \centering
+\end{figure}
 
 
 \begin{thebibliography}{8}
