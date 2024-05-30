@@ -132,6 +132,7 @@ Estos casos fueron detectados por TLC en un modelo formal realizado por los prop
 \begin{equation}
     Terminated \triangleq \forall self \in ProcSet: pc[self] = "Done"
 \end{equation}
+donde $ProcSet$ es el conjunto de procesos, $pc$ es el contador de programa de cada proceso, y $"Done"$ es el estado final del proceso.
 
 Y el invariante de unicidad de documentos
 \[
@@ -141,6 +142,8 @@ Y el invariante de unicidad de documentos
     &\phantom{Inv} \land expected\_doc \neq NULL \implies lucene\_document.content = expected\_doc
 \end{aligned}
 \]
+
+donde $expected\_doc$ es el documento esperado, y $lucene\_document$ es el documento en el sistema de indexación.
 
 
 \subsection{Prueba de un algoritmo tolerante a demoras y fallas de renombre de procesos}
