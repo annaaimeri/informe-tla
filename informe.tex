@@ -79,7 +79,7 @@ TLA+ permite realizar un análisis exhaustivo de propiedades críticas, como la 
 %
 $Action_{i}$ representa una acción, que se puede expresar como una conjunción de precondiciones y postcondiciones, donde la postcondición en general usa el valor de una variable en el próximo estado para describir la acción que se puede realizar dadas las precondiciones. \textit{Init} es el predicado de estado inicial, \textit{Next} es el predicado del siguiente estado válido, y \textit{Spec} es la especificación completa del sistema, que incluye el estado inicial, la relación de transición y condiciones de fairness, que puede ser débil o fuerte. Dada una acción A, la condición de fairness débil \textit{WF(A)} asegura que si A es habilitada permanentemente a partir de un estado, i.e. se cumplen las precondiciones de A, entonces A se ejecutará infinitas veces. La condición de fairness fuerte \textit{SF(A)} asegura que si A es habilitada frecuentemente a lo largo de una traza de estados, entonces A se ejecutará infinitas veces. El subíndice $\langle vars \rangle$ en \textit{Next} indican que puede darse que ninguna de esas variables cambien en un estado, y en las propiedades de fairness significa que el progreso debe darse para todas las variables del conjunto. 
 
-Además, es posible con TLA+ formular teoremas y diseñar pruebas formales sobre propiedades de estas especificaciones en TLAPS. Un caso general puede enunciarse así en TLA+.
+Además, es posible con TLA+ formular teoremas y diseñar pruebas formales sobre propiedades de estas especificaciones en TLAPS. Un caso general puede enunciarse de la siguiente forma:
 %
 \[
 \begin{aligned}
@@ -116,8 +116,8 @@ En la verificación de modelos con TLC es posible que se generen falsos negativo
 
 El procesamiento de TLAPS para probar un teorema, por su parte, se ilustra en la figura \ref{fig1}. TLAPM (TLA Proof Manager) lee el archivo con la especificación en TLA+, y luego de ser analizado aplica una serie de transformaciones para enviarlo a motores de prueba externos, entre ellos SMT solvers (z3, cvc4, veriT), basados en método Tableaux (zenon), entre otros. 
 Para probar una obligación de prueba el comportamiento por defecto es intentar resolverla con tres backends en secuencia, Z3, Zenon e Isabelle, con 5, 10, 30 segundos sus respectivos timeouts.
-TLAPS ofrece muchas opciones para configurar timeouts, orden de solvers, y demás restricciones, el sistema de especificación es totalmente independiente.
-%
+TLAPS ofrece muchas opciones para configurar timeouts, orden de solvers, y demás restricciones, el sistema de especificación es totalmente independiente. %% revisar referencias
+% 
 \begin{figure}
     \caption{Arquitectura de TLAPS.}\label{fig1}
     \includegraphics[width=8cm]{tlaps_arch.png}
@@ -136,36 +136,7 @@ TLA+ se utiliza en Amazon Web Services (AWS) para corregir errores y mejorar la 
 Debido al gran volumen de procesos que se realizan en los servidores de AWS, garantizar un código con la menor cantidad de bugs posible es esencial. Aunque un bug pueda parecer poco probable y tener una probabilidad de ocurrencia muy baja, la enorme cantidad de transacciones que se realizan diariamente hace que incluso estos casos poco probables puedan surgir. Es por esto que la capacidad de TLA+ para detectar y corregir incluso los errores más sutiles se vuelve crítica en un entorno donde la fiabilidad y la precisión son imperativas.
 
 \paragraph{Prueba de un algoritmo tolerante a demoras y fallas de renombre de procesos}
-En el marco de la computación paralela, se ha realizado un trabajo de análisis y verificación de un algoritmo no bloqueante y tolerante a fallas de renombre de procesos en un sistema de memoria compartido. Esto permite probar propiedades de safety y liveness sobre el sistema. En particular se probó la siguiente propiedad de corrección:
-%
-\begin{equation}
-    \forall p, q \in Proc, p \neq q, \square(name_p \neq \bot \land name_q \neq \bot \implies name_p \neq name_q)
-\end{equation}
-%
-que cada proceso obtiene un nombre único, y la siguiente propiedad de terminación,
-%
-\begin{equation}
-    \forall p \in Proc, \square(\text{p enters the renaming} \implies \lozenge (\text{name}_p \neq \bot))
-\end{equation}
-%
-que cada proceso que entra al sistema obtiene un nombre.
-Además se proveen las pruebas pertinentes de corrección y completitud de los splitters, objetos que se utilizan para la sincronización de acciones sin bloqueo,  las cuales son
-%
-\[
-\square \left( \begin{aligned}
-    &\phantom{\land} \forall p,q \in \text{Proc}, \phantom{\land} \text{dir}_p = \text{stop} \land \text{dir}_q = \text{stop} \implies p = q \\
-    &\land \exists p \in \text{Proc}, \text{dir}_p \neq \text{right} \\
-    &\land \exists p \in \text{Proc}, \text{dir}_p \neq \text{down}
-\end{aligned} \right)
-\]
-%
-que dice que los procesos son dirigidos en alguna dirección, derecha y abajo, con fairness en ambas, y que solo se tiene un proceso asignado al nombre de ese splitter.
-%
-\[
-    \forall p \in Proc, \square(p\ entra\ al\ splitter \implies \lozenge(dir_p \in \{stop, down, right\})))    
-\]
-%
-que cada proceso que entra al splitter es direccionado a alguna de estas categorias eventualmente.
+En el marco de la computación paralela, se ha realizado un trabajo de análisis y verificación de un algoritmo no bloqueante y tolerante a fallas de renombre de procesos en un sistema de memoria compartido. Esto permite probar propiedades de safety y liveness sobre el sistema. En particular, se probó una propiedad que indica que cada proceso obtiene un nombre único, y otra que muestra que cada proceso que entra al sistema obtiene un nombre. Se realizaron, además, las pruebas pertinentes de corrección y completitud de los splitters, objetos que se utilizan para la sincronización de acciones sin bloqueo. Estas pruebas mostraban que los procesos son dirigidos en alguna dirección, derecha y abajo, con fairness en ambas, que solo se tiene un proceso asignado al nombre de ese splitter, y, finalmente, que cada proceso que entra al splitter es direccionado a alguna de estas categorias eventualmente.
 
 \section{Caso de aplicación de la herramienta}
 Se trata de un modelo de gestor de tareas, creado por el desarrollador Andreas Stührk. Este debe mantener actualizado el estado de realización de los trabajos encomendados, y asegurarse de que esto se gestione de manera concurrente. El sistema tenía un bug de consistencia en el supervisor de trabajos, y es que a veces no se percibía el cambio de ‘pendiente’ a ‘completo’. Entonces, desarrolló la especificación de las partes del sistema existente con TLA+, apoyándose también en el lenguaje de pseudocódigo asociado PlusCal, y chequeando invariantes de correctitud y progreso con TLC.
