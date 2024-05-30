@@ -36,7 +36,6 @@
 \author{Anna Aimeri, Sebastián José Giraudo, Valentín Negrelli}
 \institute{Facultad de Matemática, Astronomía, Física y Computación, Av. Medina Allende s/n, Córdoba, Argentina}
 \maketitle             
-
 \begin{abstract}
 Se presenta un set de herramientas sobre el lenguaje de especificación de modelos TLA+, que permite corregir el diseño de un sistema mediante la especificación de un modelo, y demostrar propiedades sobre sus comportamientos posibles mediante el uso de motores de prueba sobre lógica temporal de acciones. Se desarrollan características de la interfaz de usuario, el mecanismo de chequeo del modelo y especificaciones, junto a casos de aplicación en la industria por grandes tecnológicas, desde procesos de sistemas operativos en tiempo real hasta sistemas de almacenamiento distribuidos.
 \end{abstract}
@@ -68,33 +67,41 @@ El lenguaje de propiedades de TLA+ se basa en la lógica de acciones temporales 
 TLA+ permite realizar un análisis exhaustivo de propiedades críticas, como la detección de deadlocks, y el análisis de progreso. Además, TLA+ facilita la verificación de invariantes a través de fórmulas especificadas en los archivos de configuración. También permite el control de fairness, mediante la conjunción de fórmulas temporales que definen las condiciones de liveness del sistema. Las especificaciones en TLA+ suelen tener el siguiente formato:
 %
 % \begin{wrapfigure}[8]{l}{8cm}
-\begin{footnotesize}
-\[
-\begin{aligned}
-    & Action_1 \triangleq \land_{i=1}^{m_1} Pre_i \land_{i=1}^{k_1} Next_i \\
-    \dots \\
-    & Action_n \triangleq \land_{i=1}^{m_n} Pre_i \land_{i=1}^{k_n} Next_i \\
-    & Init \triangleq \land_{i=1}^{m_i} P_{var_i} \\
-    & Next \triangleq \lor_{i=1}^{n} Action_i \\
-    & Spec \triangleq Init \land \square [Next]_{\langle vars \rangle} \land WF_{\langle vars \rangle}(Action)
-\end{aligned}
-\]
-\end{footnotesize}
+% \begin{footnotesize}
+% \[
+% \begin{aligned}
+%     & Action_1 \triangleq \land_{i=1}^{m_1} Pre_i \land_{i=1}^{k_1} Next_i \\
+%     \dots \\
+%     & Action_n \triangleq \land_{i=1}^{m_n} Pre_i \land_{i=1}^{k_n} Next_i \\
+%     & Init \triangleq \land_{i=1}^{m_i} P_{var_i} \\
+%     & Next \triangleq \lor_{i=1}^{n} Action_i \\
+%     & Spec \triangleq Init \land \square [Next]_{\langle vars \rangle} \land WF_{\langle vars \rangle}(Action)
+% \end{aligned}
+% \]
+% \end{footnotesize}
 % \end{wrapfigure}
 %
+
+\begin{figure}
+    \includegraphics[width=6cm]{tla.png}
+    \includegraphics[width=6cm]{tlaps.png}
+\end{figure}
+
 $Action_{i}$ representa una acción, que se puede expresar como una conjunción de precondiciones y postcondiciones, donde la postcondición en general usa el valor de una variable en el próximo estado para describir la acción que se puede realizar dadas las precondiciones. \textit{Init} es el predicado de estado inicial, \textit{Next} es el predicado del siguiente estado válido, y \textit{Spec} es la especificación completa del sistema, que incluye el estado inicial, la relación de transición y condiciones de fairness, que puede ser débil o fuerte. Dada una acción A, la condición de fairness débil \textit{WF(A)} asegura que si A es habilitada permanentemente a partir de un estado, i.e. se cumplen las precondiciones de A, entonces A se ejecutará infinitas veces. La condición de fairness fuerte \textit{SF(A)} asegura que si A es habilitada frecuentemente a lo largo de una traza de estados, entonces A se ejecutará infinitas veces. El subíndice $\langle vars \rangle$ en \textit{Next} indican que puede darse que ninguna de esas variables cambien en un estado, y en las propiedades de fairness significa que el progreso debe darse para todas las variables del conjunto. 
 
 Además, es posible con TLA+ formular teoremas y diseñar pruebas formales sobre propiedades de estas especificaciones en TLAPS. Un caso general puede enunciarse de la siguiente forma:
-\begin{footnotesize}
-\[
-\begin{aligned}
-    & THEOREM\ ValidProperty \triangleq Spec \implies Property \\
-    & \langle 1 \rangle1. Init \implies Property \\
-    & \langle 1 \rangle2. Property \land [Next]_{\langle vars \rangle} \implies Property \\
-    & \langle 1 \rangle3. QED\ BY\ \langle 1 \rangle1, \langle 1 \rangle2,\ PTL\ DEF\ Spec
-\end{aligned}
-\]
-\end{footnotesize}
+
+% \begin{footnotesize}
+% \[
+% \begin{aligned}
+%     & THEOREM\ ValidProperty \triangleq Spec \implies Property \\
+%     & \langle 1 \rangle1. Init \implies Property \\
+%     & \langle 1 \rangle2. Property \land [Next]_{\langle vars \rangle} \implies Property \\
+%     & \langle 1 \rangle3. QED\ BY\ \langle 1 \rangle1, \langle 1 \rangle2,\ PTL\ DEF\ Spec
+% \end{aligned}
+% \]
+% \end{footnotesize}
+
 donde definimos un teorema que permite probar Property a partir de la especificación, asistiendo la demostración con el contexto necesario para los motores de prueba, como la definición de Spec y propiedades básicas de lógica temporal proposicional.
 
 Los modelos en TLA+ y su verificación en TLC ponen su foco en el comportamiento del sistema, abstrayéndose de los detalles de su implementación. Es por esto que son independientes de cualquier lenguaje de programación, y no es necesario anotar el programa. Sin embargo, es posible anotar el algoritmo usando el pseudo-código PlusCal, un lenguaje formal que se transpila a TLA+, para probar propiedades sobre sus variables. A diferencia del enfoque orientado a acciones, PlusCal se asemeja más a un lenguaje de programación imperativo y es más adecuado para especificar algoritmos secuenciales.
@@ -113,17 +120,10 @@ TLC no considera todo el espacio de estado, sino una parte de él. Utiliza una t
 En el contexto de TLA+, la simetría se aprovecha para reducir el número de estados que TLC necesita examinar al verificar una especificación. Si una especificación es simétrica con respecto a una permutación $\pi$, esto significa que si una secuencia de estados $\sigma$ satisface la especificación, entonces cualquier permutación de esa secuencia, $\sigma\pi$, también lo hará. Por lo tanto, si TLC ya ha verificado un comportamiento $\sigma$, no necesita verificar cualquier $\sigma\pi$ correspondiente, ya que cualquier error revelado por $\sigma$ también se revelaría por $\sigma\pi$.
 
 En TLA+, se puede escribir una especificación de un programa que implementa una especificación más general mediante un mapeo de refinamiento adecuado. Este proceso implica mapear las variables de la especificación que se desea que el programa satisfaga con los estados de la especificación del programa en cuestión. El mapeo de refinamiento explica detalladamente cómo el programa cumple con la especificación general, lo que permite abstraer detalles específicos del programa y centrarse en su comportamiento general, asegurando que se cumplan las propiedades deseadas a nivel de especificación más alta.
-% 
-\begin{wrapfigure}{r}{8cm}
-    \centering
-    \includegraphics[width=8cm]{tlaps_arch.png}
-    \caption{Arquitectura de TLAPS.}
-    \label{fig1}
-\end{wrapfigure}
-%
+
 En la verificación de modelos con TLC es posible que se generen falsos negativos, especialmente en el contexto de propiedades de liveness. Esto se debe a la dificultad de detectar violaciones de propiedades de liveness con modelos finitos, ya que estas propiedades requieren que el sistema alcance ciertos estados infinitas veces o en un orden específico, lo cual puede ser imposible de capturar con un modelo de estas características.
 
-El procesamiento de TLAPS para probar un teorema, por su parte, se ilustra en la figura \ref{fig1}. TLAPM (TLA Proof Manager) lee el archivo con la especificación en TLA+, y luego de ser analizado aplica una serie de transformaciones para enviarlo a motores de prueba externos, entre ellos SMT solvers (z3, cvc4, veriT), basados en método Tableaux (zenon), entre otros. 
+El procesamiento de TLAPS para probar un teorema, por su parte, es manejado por el TLAPM (TLA Proof Manager), que lee el archivo con la especificación en TLA+, y luego de ser analizado aplica una serie de transformaciones para enviarlo a motores de prueba externos, entre ellos SMT solvers (z3, cvc4, veriT), basados en método Tableaux (zenon), entre otros. 
 Para probar una obligación de prueba el comportamiento por defecto es intentar resolverla con tres backends en secuencia, Z3, Zenon e Isabelle, con 5, 10, 30 segundos sus respectivos timeouts.
 TLAPS ofrece muchas opciones para configurar timeouts, orden de solvers, y demás restricciones, el sistema de especificación es totalmente independiente. %% revisar referencias
 
@@ -144,12 +144,12 @@ En el marco de la computación paralela, se ha realizado un trabajo de análisis
 \section{Caso de aplicación de la herramienta}
 Se trata de un modelo de gestor de tareas, creado por el desarrollador Andreas Stührk. Este debe mantener actualizado el estado de realización de los trabajos encomendados, y asegurarse de que esto se gestione de manera concurrente. El sistema tenía un bug de consistencia en el supervisor de trabajos, y es que a veces no se percibía el cambio de ‘pendiente’ a ‘completo’. Entonces, desarrolló la especificación de las partes del sistema existente con TLA+, apoyándose también en el lenguaje de pseudocódigo asociado PlusCal, y chequeando invariantes de correctitud y progreso con TLC.
 
-\begin{wrapfigure}{r}{6cm}
-    \centering
-    \includegraphics[width=6cm]{formalizing-the-system.png}
-    \caption{Arquitectura del sistema gestor de tareas.}
-    \label{caso_estudio}
-\end{wrapfigure}
+% \begin{wrapfigure}{r}{6cm}
+%     \centering
+%     \includegraphics[width=4cm]{formalizing-the-system.png}
+%     \caption{Arquitectura del sistema gestor de tareas.}
+%     \label{caso_estudio}
+% \end{wrapfigure}
 
 Cada trabajo consiste en la completitud de tareas independientes. El sistema, a su vez, se compone de un supervisor de progreso, que toma los mensajes de estado de tareas de una cola FIFO conectada a las unidades de procesamiento, y decide si el trabajo está completo, almacenando la información del progreso en nodos en una unidad de almacenamiento (Cassandra). Esta unidad implementa factores de replicación y niveles de consistencia para asegurar que los datos sean replicados y leídos de manera confiable entre múltiples nodos. En Figura \ref{caso_estudio} se puede ver un diagrama de la arquitectura del sistema. 
 
