@@ -64,23 +64,7 @@ El lenguaje de especificación de modelos TLA+ es un lenguaje formal que combina
 
 El lenguaje de propiedades de TLA+ se basa en la lógica de acciones temporales (TLA). Esta lógica combina la lógica temporal con una lógica de acciones, proporcionando constructores que incluyen predicados sobre estados iniciales, relaciones de transición entre estados sucesivos y condiciones de fairness para garantizar un progreso adecuado en el sistema.
 
-TLA+ permite realizar un análisis exhaustivo de propiedades críticas, como la detección de deadlocks, y el análisis de progreso. Además, TLA+ facilita la verificación de invariantes a través de fórmulas especificadas en los archivos de configuración. También permite el control de fairness, mediante la conjunción de fórmulas temporales que definen las condiciones de liveness del sistema. Las especificaciones en TLA+ suelen tener el siguiente formato:
-%
-% \begin{wrapfigure}[8]{l}{8cm}
-% \begin{footnotesize}
-% \[
-% \begin{aligned}
-%     & Action_1 \triangleq \land_{i=1}^{m_1} Pre_i \land_{i=1}^{k_1} Next_i \\
-%     \dots \\
-%     & Action_n \triangleq \land_{i=1}^{m_n} Pre_i \land_{i=1}^{k_n} Next_i \\
-%     & Init \triangleq \land_{i=1}^{m_i} P_{var_i} \\
-%     & Next \triangleq \lor_{i=1}^{n} Action_i \\
-%     & Spec \triangleq Init \land \square [Next]_{\langle vars \rangle} \land WF_{\langle vars \rangle}(Action)
-% \end{aligned}
-% \]
-% \end{footnotesize}
-% \end{wrapfigure}
-%
+Las especificaciones en TLA+ suelen tener el siguiente formato:
 
 \begin{figure}
     \includegraphics[width=6cm]{tla.png}
@@ -90,17 +74,6 @@ TLA+ permite realizar un análisis exhaustivo de propiedades críticas, como la 
 $Action_{i}$ representa una acción, que se puede expresar como una conjunción de precondiciones y postcondiciones, donde la postcondición en general usa el valor de una variable en el próximo estado para describir la acción que se puede realizar dadas las precondiciones. \textit{Init} es el predicado de estado inicial, \textit{Next} es el predicado del siguiente estado válido, y \textit{Spec} es la especificación completa del sistema, que incluye el estado inicial, la relación de transición y condiciones de fairness, que puede ser débil o fuerte. Dada una acción A, la condición de fairness débil \textit{WF(A)} asegura que si A es habilitada permanentemente a partir de un estado, i.e. se cumplen las precondiciones de A, entonces A se ejecutará infinitas veces. La condición de fairness fuerte \textit{SF(A)} asegura que si A es habilitada frecuentemente a lo largo de una traza de estados, entonces A se ejecutará infinitas veces. El subíndice $\langle vars \rangle$ en \textit{Next} indican que puede darse que ninguna de esas variables cambien en un estado, y en las propiedades de fairness significa que el progreso debe darse para todas las variables del conjunto. 
 
 Además, es posible con TLA+ formular teoremas y diseñar pruebas formales sobre propiedades de estas especificaciones en TLAPS. Un caso general puede enunciarse de la siguiente forma:
-
-% \begin{footnotesize}
-% \[
-% \begin{aligned}
-%     & THEOREM\ ValidProperty \triangleq Spec \implies Property \\
-%     & \langle 1 \rangle1. Init \implies Property \\
-%     & \langle 1 \rangle2. Property \land [Next]_{\langle vars \rangle} \implies Property \\
-%     & \langle 1 \rangle3. QED\ BY\ \langle 1 \rangle1, \langle 1 \rangle2,\ PTL\ DEF\ Spec
-% \end{aligned}
-% \]
-% \end{footnotesize}
 
 donde definimos un teorema que permite probar Property a partir de la especificación, asistiendo la demostración con el contexto necesario para los motores de prueba, como la definición de Spec y propiedades básicas de lógica temporal proposicional.
 
@@ -144,14 +117,7 @@ En el marco de la computación paralela, se ha realizado un trabajo de análisis
 \section{Caso de aplicación de la herramienta}
 Se trata de un modelo de gestor de tareas, creado por el desarrollador Andreas Stührk. Este debe mantener actualizado el estado de realización de los trabajos encomendados, y asegurarse de que esto se gestione de manera concurrente. El sistema tenía un bug de consistencia en el supervisor de trabajos, y es que a veces no se percibía el cambio de ‘pendiente’ a ‘completo’. Entonces, desarrolló la especificación de las partes del sistema existente con TLA+, apoyándose también en el lenguaje de pseudocódigo asociado PlusCal, y chequeando invariantes de correctitud y progreso con TLC.
 
-% \begin{wrapfigure}{r}{6cm}
-%     \centering
-%     \includegraphics[width=4cm]{formalizing-the-system.png}
-%     \caption{Arquitectura del sistema gestor de tareas.}
-%     \label{caso_estudio}
-% \end{wrapfigure}
-
-Cada trabajo consiste en la completitud de tareas independientes. El sistema, a su vez, se compone de un supervisor de progreso, que toma los mensajes de estado de tareas de una cola FIFO conectada a las unidades de procesamiento, y decide si el trabajo está completo, almacenando la información del progreso en nodos en una unidad de almacenamiento (Cassandra). Esta unidad implementa factores de replicación y niveles de consistencia para asegurar que los datos sean replicados y leídos de manera confiable entre múltiples nodos. En Figura \ref{caso_estudio} se puede ver un diagrama de la arquitectura del sistema. 
+Cada trabajo consiste en la completitud de tareas independientes. El sistema, a su vez, se compone de un supervisor de progreso, que toma los mensajes de estado de tareas de una cola FIFO conectada a las unidades de procesamiento, y decide si el trabajo está completo, almacenando la información del progreso en nodos en una unidad de almacenamiento (Cassandra). Esta unidad implementa factores de replicación y niveles de consistencia para asegurar que los datos sean replicados y leídos de manera confiable entre múltiples nodos.
 
 En este trabajo se simplificó al máximo el modelo del sistema para atacar el problema de consistencia observado, modelando únicamente la operación de tomar un elemento de la cola.
 
@@ -224,8 +190,7 @@ return session
 .setConsistencyLevel(consistencyLevel);
 \end{lstlisting}
 
-%
-Por otra parte, es posible ver una limitación en el diseño, ya que no puede probarse la propiedad que especifica que el cambio de estado de ‘pendiente’ a ‘completo’ se observa a lo sumo una vez ( \([NoDupSwitch == switchHappened <= 1]\) ), implicando el riesgo de reportar como completado más de una vez un trabajo.
+Por otra parte, es posible ver una limitación en el diseño, ya que no puede probarse la propiedad que especifica que el cambio de estado de ‘pendiente’ a ‘completo’ se observa a lo sumo una vez $NoDupSwitch == switchHappened <= 1$, implicando el riesgo de reportar como completado más de una vez un trabajo.
 
 \section{Conclusiones}
 
