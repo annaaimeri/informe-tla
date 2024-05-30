@@ -8,6 +8,7 @@
 \usepackage[spanish,es-tabla]{babel}
 \usepackage{listings}
 \usepackage{color}
+\usepackage{wrapfig}
 
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
@@ -66,6 +67,8 @@ El lenguaje de propiedades de TLA+ se basa en la lógica de acciones temporales 
 
 TLA+ permite realizar un análisis exhaustivo de propiedades críticas, como la detección de deadlocks, y el análisis de progreso. Además, TLA+ facilita la verificación de invariantes a través de fórmulas especificadas en los archivos de configuración. También permite el control de fairness, mediante la conjunción de fórmulas temporales que definen las condiciones de liveness del sistema. Las especificaciones en TLA+ suelen tener el siguiente formato:
 %
+\begin{wrapfigure}[8]{l}{8cm}
+\begin{footnotesize}
 \[
 \begin{aligned}
     & Action_1 \triangleq \land_{i=1}^{m_1} Pre_i \land_{i=1}^{k_1} Next_i \\
@@ -76,11 +79,13 @@ TLA+ permite realizar un análisis exhaustivo de propiedades críticas, como la 
     & Spec \triangleq Init \land \square [Next]_{\langle vars \rangle} \land WF_{\langle vars \rangle}(Action)
 \end{aligned}
 \]
+\end{footnotesize}
+\end{wrapfigure}
 %
 $Action_{i}$ representa una acción, que se puede expresar como una conjunción de precondiciones y postcondiciones, donde la postcondición en general usa el valor de una variable en el próximo estado para describir la acción que se puede realizar dadas las precondiciones. \textit{Init} es el predicado de estado inicial, \textit{Next} es el predicado del siguiente estado válido, y \textit{Spec} es la especificación completa del sistema, que incluye el estado inicial, la relación de transición y condiciones de fairness, que puede ser débil o fuerte. Dada una acción A, la condición de fairness débil \textit{WF(A)} asegura que si A es habilitada permanentemente a partir de un estado, i.e. se cumplen las precondiciones de A, entonces A se ejecutará infinitas veces. La condición de fairness fuerte \textit{SF(A)} asegura que si A es habilitada frecuentemente a lo largo de una traza de estados, entonces A se ejecutará infinitas veces. El subíndice $\langle vars \rangle$ en \textit{Next} indican que puede darse que ninguna de esas variables cambien en un estado, y en las propiedades de fairness significa que el progreso debe darse para todas las variables del conjunto. 
 
 Además, es posible con TLA+ formular teoremas y diseñar pruebas formales sobre propiedades de estas especificaciones en TLAPS. Un caso general puede enunciarse de la siguiente forma:
-%
+\begin{footnotesize}
 \[
 \begin{aligned}
     & THEOREM\ ValidProperty \triangleq Spec \implies Property \\
@@ -89,7 +94,7 @@ Además, es posible con TLA+ formular teoremas y diseñar pruebas formales sobre
     & \langle 1 \rangle3. QED\ BY\ \langle 1 \rangle1, \langle 1 \rangle2,\ PTL\ DEF\ Spec
 \end{aligned}
 \]
-%
+\end{footnotesize}
 donde definimos un teorema que permite probar Property a partir de la especificación, asistiendo la demostración con el contexto necesario para los motores de prueba, como la definición de Spec y propiedades básicas de lógica temporal proposicional.
 
 Los modelos en TLA+ y su verificación en TLC ponen su foco en el comportamiento del sistema, abstrayéndose de los detalles de su implementación. Es por esto que son independientes de cualquier lenguaje de programación, y no es necesario anotar el programa. Sin embargo, es posible anotar el algoritmo usando el pseudo-código PlusCal, un lenguaje formal que se transpila a TLA+, para probar propiedades sobre sus variables. A diferencia del enfoque orientado a acciones, PlusCal se asemeja más a un lenguaje de programación imperativo y es más adecuado para especificar algoritmos secuenciales. (\textbf{EJEMPLO: snippet en PlusCal}).
@@ -111,19 +116,20 @@ En el contexto de TLA+, la simetría se aprovecha para reducir el número de est
 Para aprovechar esta simetría, se puede incluir una declaración SYMMETRY en el archivo de configuración de TLC, definiendo un conjunto de permutaciones relevantes. Esto permite a TLC evitar agregar estados redundantes a su cola de estados no examinados y al grafo de estados si esos estados ya existen bajo alguna permutación.
 
 En TLA+, se puede escribir una especificación de un programa que implementa una especificación más general mediante un mapeo de refinamiento adecuado. Este proceso implica mapear las variables de la especificación que se desea que el programa satisfaga con los estados de la especificación del programa en cuestión. El mapeo de refinamiento explica detalladamente cómo el programa cumple con la especificación general, lo que permite abstraer detalles específicos del programa y centrarse en su comportamiento general, asegurando que se cumplan las propiedades deseadas a nivel de especificación más alta.
-
+% 
+\begin{wrapfigure}{r}{8cm}
+    \centering
+    \includegraphics[width=8cm]{tlaps_arch.png}
+    \caption{Arquitectura de TLAPS.}
+    \label{fig1}
+\end{wrapfigure}
+%
 En la verificación de modelos con TLC es posible que se generen falsos negativos, especialmente en el contexto de propiedades de liveness. Esto se debe a la dificultad de detectar violaciones de propiedades de liveness con modelos finitos, ya que estas propiedades requieren que el sistema alcance ciertos estados infinitas veces o en un orden específico, lo cual puede ser imposible de capturar con un modelo de estas características.
 
 El procesamiento de TLAPS para probar un teorema, por su parte, se ilustra en la figura \ref{fig1}. TLAPM (TLA Proof Manager) lee el archivo con la especificación en TLA+, y luego de ser analizado aplica una serie de transformaciones para enviarlo a motores de prueba externos, entre ellos SMT solvers (z3, cvc4, veriT), basados en método Tableaux (zenon), entre otros. 
 Para probar una obligación de prueba el comportamiento por defecto es intentar resolverla con tres backends en secuencia, Z3, Zenon e Isabelle, con 5, 10, 30 segundos sus respectivos timeouts.
 TLAPS ofrece muchas opciones para configurar timeouts, orden de solvers, y demás restricciones, el sistema de especificación es totalmente independiente. %% revisar referencias
-% 
-\begin{figure}
-    \caption{Arquitectura de TLAPS.}\label{fig1}
-    \includegraphics[width=8cm]{tlaps_arch.png}
-    \centering
-\end{figure}
-%
+
 \section{Casos de estudio}
 \paragraph{Intel}
 En Intel, TLA+ y TLC se han utilizado para diseñar y verificar protocolos de coherencia de caché en procesadores multinúcleo, en particular para los procesadores Alpha EV7 y EV8. En el caso de EV8 en particular, la especificación fue completada antes de que el diseño fuera estable, lo que brindó feedback temprano sobre la viabilidad del sistema a los diseñadores.
@@ -141,13 +147,14 @@ En el marco de la computación paralela, se ha realizado un trabajo de análisis
 \section{Caso de aplicación de la herramienta}
 Se trata de un modelo de gestor de tareas, creado por el desarrollador Andreas Stührk. Este debe mantener actualizado el estado de realización de los trabajos encomendados, y asegurarse de que esto se gestione de manera concurrente. El sistema tenía un bug de consistencia en el supervisor de trabajos, y es que a veces no se percibía el cambio de ‘pendiente’ a ‘completo’. Entonces, desarrolló la especificación de las partes del sistema existente con TLA+, apoyándose también en el lenguaje de pseudocódigo asociado PlusCal, y chequeando invariantes de correctitud y progreso con TLC.
 
-Cada trabajo consiste en la completitud de tareas independientes. El sistema, a su vez, se compone de un supervisor de progreso, que toma los mensajes de estado de tareas de una cola FIFO conectada a las unidades de procesamiento, y decide si el trabajo está completo, almacenando la información del progreso en nodos en una unidad de almacenamiento (Cassandra). Esta unidad implementa factores de replicación y niveles de consistencia para asegurar que los datos sean replicados y leídos de manera confiable entre múltiples nodos. En Figura \ref{caso_estudio} se puede ver un diagrama de la arquitectura del sistema. 
-
-\begin{figure}
-    \caption{Arquitectura del sistema gestor de tareas.}\label{caso_estudio}
-    \includegraphics[width=5cm]{formalizing-the-system.png}
+\begin{wrapfigure}{r}{6cm}
     \centering
-\end{figure}
+    \includegraphics[width=6cm]{formalizing-the-system.png}
+    \caption{Arquitectura del sistema gestor de tareas.}
+    \label{caso_estudio}
+\end{wrapfigure}
+
+Cada trabajo consiste en la completitud de tareas independientes. El sistema, a su vez, se compone de un supervisor de progreso, que toma los mensajes de estado de tareas de una cola FIFO conectada a las unidades de procesamiento, y decide si el trabajo está completo, almacenando la información del progreso en nodos en una unidad de almacenamiento (Cassandra). Esta unidad implementa factores de replicación y niveles de consistencia para asegurar que los datos sean replicados y leídos de manera confiable entre múltiples nodos. En Figura \ref{caso_estudio} se puede ver un diagrama de la arquitectura del sistema. 
 
 En este trabajo se simplificó al máximo el modelo del sistema para atacar el problema de consistencia observado, modelando únicamente la operación de tomar un elemento de la cola.
 
@@ -184,29 +191,31 @@ end process;
 
 donde $writeQuorumNodes$ representa los nodos donde se desea escribir la actualización del progreso, $readQuorumNodes$ el conjunto de nodos de donde se lee el progreso del trabajo en un instante, $secondReadQuorumNodes$ el conjunto de lectura en el instante siguiente, y $unacked$ lleva la cuenta de mensajes procesandose por el supervisor, $switchHappened$ la cantidad de veces que se cambia el estado de ‘pendiente’ a ‘completo’ de un trabajo, y $queue$ la cola de mensajes con tareas completas por las unidades de procesamiento.
 
-Podemos entonces definir las propiedades a verificar en el modelo. En primer lugar, el invariante de correctitud, que asegure que o bien quedan tareas aún no procesadas como completas (cola no vacía), o bien el manejador está procesando un mensaje de status (unacked > 0), o bien ya se ha completado el trabajo y se puede visualizar en el supervisor (switchHappened > 0). Definimos además, la propiedad de progreso esperada, que denote que el supervisor cambia de estado eventualmente.
-%
+Podemos entonces definir las propiedades a verificar en el modelo. En primer lugar, el invariante de correctitud, que asegure que o bien quedan tareas aún no procesadas como completas (cola no vacía), o bien el manejador está procesando un mensaje de status (\(unacked > 0\)), o bien ya se ha completado el trabajo y se puede visualizar en el supervisor (\(switchHappened > 0\)). Definimos además, la propiedad de progreso esperada, que denote que el supervisor cambia de estado eventualmente.
+
+\begin{wrapfigure}[6]{l}{6.5cm}
 \begin{lstlisting}
 Correctness == \/ queue # <<>>
-               \/ unacked > 0
-               \/ switchHappened > 0    
+                 \/ unacked > 0
+                 \/ switchHappened > 0    
 
 Liveness == <>[](switchHappened > 0)
 \end{lstlisting}
-%
+\end{wrapfigure}
+
 Esta especificación logró poner en evidencia el error. En el diseño del sistema se puede demostrar que es necesario hacer lecturas y escrituras por quórum en los nodos de Cassandra, indicando que la lectura de un único nodo no es confiable, ya que este puede no haber sido actualizado por algún interleaving con otra lectura del proceso. Al analizar más profundamente, se descubrió que en la implementación real las lecturas de la base de datos no usaban niveles de consistencia de quórum correctamente.
 
 El código usa Java con la librería Datastax Cassandra Driver statements con el siguiente formato:
-%
+% \begin{wrapfigure}{l}{8.5cm}
 \begin{lstlisting}[language=Java]
 Statement insert = QueryBuilder
 .insertInto(keyspace, columnFamily)
-// Omitted: binding expressions for the values here ...
+// Omitted: binding expressions for the values here
 .setConsistencyLevel(consistencyLevel);
-
 return session.prepare(insert.toString());
 \end{lstlisting}
-%
+% \end{wrapfigure}
+
 El bug se encuentra en esta sección, ya que no se incluye la propiedad del nivel de consistencia en la representación en string de la consulta, por lo que el siguiente cambio enmienda el error:
 %
 \begin{lstlisting}
@@ -217,9 +226,9 @@ return session
 .prepare(insert.toString());
 .setConsistencyLevel(consistencyLevel);
 \end{lstlisting}
+
 %
-Por otra parte, es posible ver una limitación en el diseño, ya que no puede probarse la propiedad que especifica que el cambio de estado de ‘pendiente’ a ‘completo’ se observa a lo sumo una vez
-(\[NoDupSwitch == switchHappened <= 1\]), implicando el riesgo de realizar dos o más veces el mismo trabajo.
+Por otra parte, es posible ver una limitación en el diseño, ya que no puede probarse la propiedad que especifica que el cambio de estado de ‘pendiente’ a ‘completo’ se observa a lo sumo una vez ( \([NoDupSwitch == switchHappened <= 1]\) ), implicando el riesgo de realizar dos o más veces el mismo trabajo.
 
 \section{Conclusiones}
 
