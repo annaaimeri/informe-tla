@@ -125,17 +125,17 @@ TLAPS ofrece muchas opciones para configurar timeouts, orden de solvers, y demá
 \end{figure}
 %
 \section{Casos de estudio}
-\subsection{Intel}
+\paragraph{Intel}
 En Intel, TLA+ y TLC se han utilizado para diseñar y verificar protocolos de coherencia de caché en procesadores multinúcleo, en particular para los procesadores Alpha EV7 y EV8. En el caso de EV8 en particular, la especificación fue completada antes de que el diseño fuera estable, lo que brindó feedback temprano sobre la viabilidad del sistema a los diseñadores.
 
 TLA+ facilita la exploración de optimizaciones y modificaciones del protocolo, permitiendo iteraciones rápidas y evaluaciones de su impacto en la complejidad del estado. La experiencia de los ingenieros de Intel mostró que TLA+ es una herramienta poderosa para encontrar errores y mejorar la eficiencia de los diseños complejos en etapas tempranas del desarrollo.
 
-\subsection{Amazon}
+\paragraph{Amazon}
 TLA+ se utiliza en Amazon Web Services (AWS) para corregir errores y mejorar la fiabilidad de diversos sistemas. El uso de herramientas de especificación formal y verificación de modelos permitió a los ingenieros verificar la corrección del sistema, comprender su funcionamiento interno y realizar optimizaciones de rendimiento sin sacrificar la corrección. La lista de proyectos donde Amazon utiliza esta herramienta incluye S3, DynamoDB, EBS (Elastic Block Store).
 
 Debido al gran volumen de procesos que se realizan en los servidores de AWS, garantizar un código con la menor cantidad de bugs posible es esencial. Aunque un bug pueda parecer poco probable y tener una probabilidad de ocurrencia muy baja, la enorme cantidad de transacciones que se realizan diariamente hace que incluso estos casos poco probables puedan surgir. Es por esto que la capacidad de TLA+ para detectar y corregir incluso los errores más sutiles se vuelve crítica en un entorno donde la fiabilidad y la precisión son imperativas.
 
-\subsection{Prueba de un algoritmo tolerante a demoras y fallas de renombre de procesos}
+\paragraph{Prueba de un algoritmo tolerante a demoras y fallas de renombre de procesos}
 En el marco de la computación paralela, se ha realizado un trabajo de análisis y verificación de un algoritmo no bloqueante y tolerante a fallas de renombre de procesos en un sistema de memoria compartido. Esto permite probar propiedades de safety y liveness sobre el sistema. En particular se probó la siguiente propiedad de corrección:
 %
 \begin{equation}
