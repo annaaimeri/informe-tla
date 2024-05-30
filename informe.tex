@@ -41,12 +41,12 @@ El lenguaje de especificación de modelos TLA+ es un lenguaje formal que combina
 
 El lenguaje de propiedades de TLA+ se basa en la lógica de acciones temporales (TLA). Esta lógica combina la lógica temporal con una lógica de acciones, proporcionando constructores que incluyen predicados sobre estados iniciales, relaciones de transición entre estados sucesivos y condiciones de fairness para garantizar un progreso adecuado en el sistema.
 
-TLA+ permite realizar un análisis exhaustivo de propiedades críticas, como la detección de deadlocks, y el análisis de progreso, garantizando que el sistema avance hacia estados deseados. Además, TLA+ facilita la verificación de invariantes, propiedades que deben mantenerse verdaderas en todos los estados alcanzables del sistema, a través de fórmulas especificadas en los archivos de configuración. También permite el control de fairness, mediante la conjunción de fórmulas temporales que definen las condiciones de liveness del sistema. (\textbf{EJEMPLO: esquema basico de especificacion en TLA}). En general en TLA+ estas especificaciones se traducen en el siguiente formato
+TLA+ permite realizar un análisis exhaustivo de propiedades críticas, como la detección de deadlocks, y el análisis de progreso, garantizando que el sistema avance hacia estados deseados. Además, TLA+ facilita la verificación de invariantes, propiedades que deben mantenerse verdaderas en todos los estados alcanzables del sistema, a través de fórmulas especificadas en los archivos de configuración. También permite el control de fairness, mediante la conjunción de fórmulas temporales que definen las condiciones de liveness del sistema. En general en TLA+ estas especificaciones se traducen en el siguiente formato
 \[
 \begin{aligned}
-    & Action_1 \triangleq \land_{i=1}^{m_1} [Pre_i]_{vars} \land_{i=1}^{k_1} [Next_i] \\
+    & Action_1 \triangleq \land_{i=1}^{m_1} Pre_i \land_{i=1}^{k_1} Next_i \\
     \dots \\
-    & Action_n \triangleq \land_{i=1}^{m_n} [Pre_i]_{vars} \land_{i=1}^{k_n} [Next_i] \\
+    & Action_n \triangleq \land_{i=1}^{m_n} Pre_i \land_{i=1}^{k_n} Next_i \\
     & Init \triangleq \land_{i=1}^{m_i} P_{var_i} \\
     & Next \triangleq \lor_{i=1}^{n} Action_i \\
     & Spec \triangleq Init \land \square [Next]_{\langle vars \rangle} \land WF_{\langle vars \rangle}(Action)
