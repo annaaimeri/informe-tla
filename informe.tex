@@ -6,15 +6,38 @@
 \usepackage{multirow}
 \usepackage{url}
 \usepackage[spanish,es-tabla]{babel}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
 
 \begin{document}
 \title{TLA+}
-\author{Anna Aimeri, Sebastián Giraudo, Valentín Negrelli}
+\author{Anna Aimeri, Sebastián José Giraudo, Valentín Negrelli}
 \institute{Facultad de Matemática, Astronomía, Física y Computación, Av. Medina Allende s/n, Córdoba, Argentina}
-\maketitle              % typeset the header of the contribution
-%
+\maketitle             
+
 \begin{abstract}
-Se presenta un set de herramientas sobre el lenguaje de especificación de modelos TLA+, que permite corregir el diseño de un sistema mediante la especificación de un modelo, y demostrar propiedades sobre sus comportamientos posibles mediante el uso de motores de prueba sobre lógica temporal de acciones. Se desarrollan características de la interfaz de usuario, el mecanismo de chequeo del modelo y especificaciones,  y casos de aplicación en la industria por grandes tecnológicas, desde procesos de sistemas operativos en tiempo real hasta sistemas de almacenamiento distribuidos.
+Se presenta un set de herramientas sobre el lenguaje de especificación de modelos TLA+, que permite corregir el diseño de un sistema mediante la especificación de un modelo, y demostrar propiedades sobre sus comportamientos posibles mediante el uso de motores de prueba sobre lógica temporal de acciones. Se desarrollan características de la interfaz de usuario, el mecanismo de chequeo del modelo y especificaciones, junto a casos de aplicación en la industria por grandes tecnológicas, desde procesos de sistemas operativos en tiempo real hasta sistemas de almacenamiento distribuidos.
 \end{abstract}
 
 \section{Introducción}
@@ -26,22 +49,28 @@ En el presente trabajo se desarrollarán las herramientas de verificación sobre
 
 
 \section{Contexto de creación}
+La herramienta TLA+ fue creada por Leslie Lamport en un contexto académico, aunque con un enfoque práctico que la hace especialmente útil en el ámbito industrial. Lamport, conocido por sus contribuciones a los algoritmos concurrentes y distribuidos, desarrolló TLA+ a partir de su insatisfacción con las especificaciones basadas en propiedades temporales. En lugar de seguir la tendencia de la época de buscar la lógica perfecta para la especificación de sistemas concurrentes, Lamport creó la Temporal Logic of Actions (TLA) a finales de los años 80, un formalismo que apunta a minimizar el razonamiento temporal y se centra en las acciones.
+
+El desarrollo de TLA+ fue una evolución natural de TLA, formalizándose completamente alrededor de 1993. Aunque inicialmente no se diseñó para verificación mecánica, en 1999, Yuan Yu creó un verificador de modelos para TLA+ llamado TLC. Más tarde, en 2008, un equipo en INRIA desarrolló un verificador de pruebas mecánicas para TLA+, conocido como TLAPS. En 2009, Lamport introdujo PlusCal, un lenguaje de algoritmos que se asemeja al pseudocódigo pero se transpila a TLA+.
+
+TLA+ se encuentra en un estado de continuo desarrollo y expansión. Aunque la herramienta está diseñada principalmente para ingenieros de software y profesionales con conocimientos en lógica y teoría de conjuntos, su uso en la industria es prominente. Sin embargo, algunas características del lenguaje de especificación tienen soporte limitado, y se está trabajando en una extensión para soportarlas completamente. La investigación actual sobre un verificador de modelos más avanzado para TLA+ busca continuar este progreso, proporcionando a los ingenieros herramientas aún más poderosas para la especificación y verificación de sistemas.
 
 \section{Objetivo}
 TLA+ es un lenguaje de especificación formal multi-propósito particularmente útil para describir sistemas distribuidos y concurrentes. Se trata de un lenguaje declarativo, jerárquico, y escalable a especificaciones de grandes sistemas, que provee una abstracción consistente sobre varios motores de prueba como backend. 
 
-Las propiedades que TLA+ puede chequear son condiciones sobre ejecuciones individuales. Además permite verificar invariantes sobre comportamientos válidos tales como algunas propiedades de lógica temporal básica que respondan a características de safety y liveness, pudiendo asumir condiciones como fairness débil o fuerte sobre acciones.
+Las propiedades que TLA+ puede chequear son condiciones sobre ejecuciones individuales. Además, permite verificar invariantes sobre comportamientos válidos tales como algunas propiedades de lógica temporal básica que respondan a características de safety y liveness, pudiendo asumir condiciones sobre acciones como weak fairness o strong fairness.
 
 Dado que el objetivo de la herramienta es especificar propiedades sobre las variables libres del modelo, es utilizado principalmente en la etapa de arquitectura y diseño del software, una vez que se cuenta con la especificación y antes de codificar la implementación. A su vez, es posible apoyarse en la herramienta para derivar casos de tests, dado que un diseño certero del modelo nos provee el conjunto de propiedades a verificar para nuestra implementación.
 
 \section{Descripción del lado del usuario}
-El entorno de desarrollo integrado (IDE) para las herramientas de TLA+ es TLA Toolbox, y puede utilizarse para diseñar las especificaciones, correr el model checker (TLC) y el TLA Proof System (TLAPS) \cite{tla}. Además, es posible correr el model checker vía línea de comandos \cite{book} o a través de una extensión para Visual Studio Code, que cuenta con las funcionalidades básicas del IDE.
+El entorno de desarrollo integrado (IDE) para las herramientas de TLA+ es TLA Toolbox, y puede utilizarse para diseñar las especificaciones, correr el model checker (TLC) y el TLA Proof System (TLAPS). Además, es posible correr el model checker vía línea de comandos o a través de una extensión para Visual Studio Code, que cuenta con las funcionalidades básicas del IDE.
 
 El lenguaje de especificación de modelos TLA+ es un lenguaje formal que combina la lógica matemática con la teoría de conjuntos. Las especificaciones se disponen en módulos que describen el comportamiento global del sistema, expresando propiedades que deben mantenerse a lo largo del tiempo. Estos módulos contienen variables que representan los estados del sistema, descritos mediante expresiones lógicas. Además, pueden contener constantes, definiciones de operadores, teoremas y aseveraciones. En el contexto del lenguaje, las acciones describen las transiciones entre estados, y se definen con expresiones lógicas que relacionan el estado actual con su sucesor.
 
 El lenguaje de propiedades de TLA+ se basa en la lógica de acciones temporales (TLA). Esta lógica combina la lógica temporal con una lógica de acciones, proporcionando constructores que incluyen predicados sobre estados iniciales, relaciones de transición entre estados sucesivos y condiciones de fairness para garantizar un progreso adecuado en el sistema.
 
-TLA+ permite realizar un análisis exhaustivo de propiedades críticas, como la detección de deadlocks, y el análisis de progreso, garantizando que el sistema avance hacia estados deseados. Además, TLA+ facilita la verificación de invariantes, propiedades que deben mantenerse verdaderas en todos los estados alcanzables del sistema, a través de fórmulas especificadas en los archivos de configuración. También permite el control de fairness, mediante la conjunción de fórmulas temporales que definen las condiciones de liveness del sistema. En general en TLA+ estas especificaciones se traducen en el siguiente formato
+TLA+ permite realizar un análisis exhaustivo de propiedades críticas, como la detección de deadlocks, y el análisis de progreso. Además, TLA+ facilita la verificación de invariantes a través de fórmulas especificadas en los archivos de configuración. También permite el control de fairness, mediante la conjunción de fórmulas temporales que definen las condiciones de liveness del sistema. Las especificaciones en TLA+ suelen tener el siguiente formato:
+
 \[
 \begin{aligned}
     & Action_1 \triangleq \land_{i=1}^{m_1} Pre_i \land_{i=1}^{k_1} Next_i \\
@@ -53,7 +82,7 @@ TLA+ permite realizar un análisis exhaustivo de propiedades críticas, como la 
 \end{aligned}
 \]
 
-$Action_{i}$ representa una acción, que se puede expresar como una conjunción de precondiciones y postcondiciones, donde la postcondición en general usa el valor de una variable en el próximo estado para describir la acción que se puede realizar dadas las precondiciones de las variables. \textit{Init} es el predicado de estado inicial, \textit{Next} es el predicado del siguiente estado válido de la especificación, y \textit{Spec} es la especificación completa del sistema, que incluye el estado inicial, la relación de transición y condiciones de fairness, que puede ser débil o fuerte. Dada una acción A, la condición de fairness débil \textit{WF(A)} asegura que si A es habilitada permanentemente a partir de un estado, i.e. se cumplen las precondiciones de A, entonces A se ejecutará infinitas veces. La condición de fairness fuerte \textit{SF(A)} asegura que si A es habilitada frecuentemente a lo largo de una traza de estados, entonces A se ejecutará infinitas veces. El subíndice $\langle vars \rangle$ en \textit{Next} indican que puede darse que ninguna de esas variables cambien en un estado, y en las propiedades de fairness significa que el progreso debe darse para todas las variables del conjunto. 
+$Action_{i}$ representa una acción, que se puede expresar como una conjunción de precondiciones y postcondiciones, donde la postcondición en general usa el valor de una variable en el próximo estado para describir la acción que se puede realizar dadas las precondiciones. \textit{Init} es el predicado de estado inicial, \textit{Next} es el predicado del siguiente estado válido, y \textit{Spec} es la especificación completa del sistema, que incluye el estado inicial, la relación de transición y condiciones de fairness, que puede ser débil o fuerte. Dada una acción A, la condición de fairness débil \textit{WF(A)} asegura que si A es habilitada permanentemente a partir de un estado, i.e. se cumplen las precondiciones de A, entonces A se ejecutará infinitas veces. La condición de fairness fuerte \textit{SF(A)} asegura que si A es habilitada frecuentemente a lo largo de una traza de estados, entonces A se ejecutará infinitas veces. El subíndice $\langle vars \rangle$ en \textit{Next} indican que puede darse que ninguna de esas variables cambien en un estado, y en las propiedades de fairness significa que el progreso debe darse para todas las variables del conjunto. 
 
 Además, es posible con TLA+ formular teoremas y diseñar pruebas formales sobre propiedades de estas especificaciones en TLAPS. (\textbf{AGREGAR MAS SOBRE TLAPS)}
 
@@ -65,92 +94,70 @@ Los errores más difíciles de localizar son aquellos que TLC detecta al evaluar
 
 El verificador de modelos TLC permite la simulación de comportamientos del sistema. En modo de simulación, TLC construye y verifica repetidamente comportamientos individuales con una longitud máxima fija.
 
-% opinion seba: a este parrafo capaz lo sacaría lpm
-% como que ya nos metemos con como funciona por detras creo no? no tanto la UI
-% capaz mergearlo con el primero y/o segundo de asp tecnicos
-Para crear y verificar un comportamiento, TLC sigue un procedimiento similar al de construir el grafo G (\textbf{CUIDADO:} Acá hablamos del “grafo g” antes de definirlo), pero con una diferencia clave; después de calcular el conjunto de estados iniciales y el conjunto de sucesores para un estado dado, TLC elige pseudo-aleatoriamente un elemento de ese conjunto. Si el elemento no cumple con la restricción especificada, TLC detiene la computación de G. De lo contrario, TLC incluye ese estado en G y verifica las fórmulas de invarianza para ese estado. La construcción de G se detiene cuando se genera el número máximo especificado de estados.
-
 \section{Aspectos técnicos}
 TLC representa el espacio de estado de manera explícita utilizando un grafo dirigido G cuyos nodos son los estados del sistema. Este grafo es una parte del grafo de alcanzabilidad del estado que TLC ha encontrado hasta el momento. Además, TLC mantiene una cola U de estados que aún no han sido visitados o cuyos sucesores aún no han sido calculados.
 
 El model checker utiliza Breadth First Search para explorar los estados alcanzables de un sistema y verificar que cumplen con las invariantes especificadas. Comienza evaluando los supuestos y calculando los estados iniciales. A partir de estos estados, TLC los añade a una cola y un grafo si cumplen con las restricciones iniciales. Este método garantiza que todos los estados alcanzables se examinen sistemáticamente. Si TLC encuentra un estado sin sucesores posibles reporta un estado de deadlock, indicando que el sistema no puede progresar más desde ese punto.
 
-TLC no considera todo el espacio de estado, sino una parte de él. Utiliza una técnica de exploración exhaustiva, pero debido a limitaciones computacionales, de tiempo y de memoria, no es posible examinar todos los posibles estados de un sistema. En su lugar, TLC emplea estrategias inteligentes para explorar una porción representativa y significativa del espacio de estados, con el objetivo de detectar posibles problemas o violaciones de propiedades específicas en el modelo. Estas estrategias incluyen la generación de estados de manera incremental, el uso de técnicas de reducción como la simetría, y la exploración de estados que sean relevantes para las propiedades que se están verificando. De esta manera, TLC busca equilibrar la exhaustividad de la verificación con la eficiencia computacional, permitiendo obtener resultados significativos en un tiempo razonable.
+TLC no considera todo el espacio de estado, sino una parte de él. Utiliza una técnica de exploración exhaustiva, pero debido a limitaciones de tiempo y de memoria, no es posible examinar todos los posibles estados de un sistema. En su lugar, TLC emplea estrategias inteligentes para explorar una porción representativa y significativa del espacio de estados, con el objetivo de detectar posibles problemas o violaciones de propiedades específicas en el modelo. Estas estrategias incluyen la generación de estados de manera incremental, el uso de técnicas de reducción como la simetría, y la exploración de estados que sean relevantes para las propiedades que se están verificando. De esta manera, TLC busca equilibrar la exhaustividad de la verificación con la eficiencia computacional, permitiendo obtener resultados significativos en un tiempo razonable.
 
 En el contexto de TLA+, la simetría se aprovecha para reducir el número de estados que TLC necesita examinar al verificar una especificación. Si una especificación es simétrica con respecto a una permutación $\pi$, esto significa que si una secuencia de estados $\sigma$ satisface la especificación, entonces cualquier permutación de esa secuencia, $\sigma\pi$, también lo hará. Por lo tanto, si TLC ya ha verificado un comportamiento $\sigma$, no necesita verificar cualquier $\sigma\pi$ correspondiente, ya que cualquier error revelado por $\sigma$ también se revelaría por $\sigma\pi$.
 Para aprovechar esta simetría, se puede incluir una declaración SYMMETRY en el archivo de configuración de TLC, definiendo un conjunto de permutaciones relevantes. Esto permite a TLC evitar agregar estados redundantes a su cola de estados no examinados y al grafo de estados si esos estados ya existen bajo alguna permutación.
 
 En TLA+, se puede escribir una especificación de un programa que implementa una especificación más general mediante un mapeo de refinamiento adecuado. Este proceso implica mapear las variables de la especificación que se desea que el programa satisfaga con los estados de la especificación del programa en cuestión. El mapeo de refinamiento explica detalladamente cómo el programa cumple con la especificación general, lo que permite abstraer detalles específicos del programa y centrarse en su comportamiento general, asegurando que se cumplan las propiedades deseadas a nivel de especificación más alta.
 
-\textbf{(FALTA RESPUESTA)}
-
 En la verificación de modelos con TLC es posible que se generen falsos negativos, especialmente en el contexto de propiedades de liveness. Esto se debe a la dificultad de detectar violaciones de propiedades de liveness con modelos finitos, ya que estas propiedades requieren que el sistema alcance ciertos estados infinitas veces o en un orden específico, lo cual puede ser imposible de capturar con un modelo de estas características.
 
-\textbf{(FALTA TLAPS)}
+El procesamiento de TLAPS para probar un teorema, por su parte, se ilustra en la figura \ref{fig1}. TLAPM (TLA Proof Manager) lee el archivo con la especificación en TLA+, y luego de ser analizado aplica una serie de transformaciones para enviarlo a motores de prueba externos, entre ellos SMT solvers (z3, cvc4, veriT), basados en método Tableaux (zenon), entre otros. 
+Para probar una obligación de prueba el comportamiento por defecto es intentar resolverla con tres backends en secuencia, Z3, Zenon e Isabelle, con 5, 10, 30 segundos sus respectivos timeouts.
+TLAPS ofrece muchas opciones para configurar timeouts, orden de solvers, y demás restricciones, el sistema de especificación es totalmente independiente.
+
+\begin{figure}
+    \caption{Arquitectura de TLAPS.}\label{fig1}
+    \includegraphics[width=8cm]{tlaps_arch.png}
+    \centering
+\end{figure}
 
 \section{Casos de estudio}
 \subsection{Intel}
-En Intel, TLA+ y TLC se han utilizado para diseñar y verificar protocolos de coherencia de caché en procesadores multinúcleo, en particular para los procesadores Alpha EV7 y EV8. En particular para el proyecto del EV8, la especificación fue completada antes de que el diseño fuera estable, lo que brindó feedback a los diseñadores.
+En Intel, TLA+ y TLC se han utilizado para diseñar y verificar protocolos de coherencia de caché en procesadores multinúcleo, en particular para los procesadores Alpha EV7 y EV8. En el caso de EV8 en particular, la especificación fue completada antes de que el diseño fuera estable, lo que brindó feedback temprano sobre la viabilidad del sistema a los diseñadores.
 
-TLA+ facilita la exploración de optimizaciones y modificaciones del protocolo, permitiendo iteraciones rápidas y evaluaciones de su impacto en la complejidad del estado. La experiencia de los ingenieros de Intel muestra que TLA+ es una herramienta poderosa para encontrar errores y mejorar la eficiencia de los diseños complejos en etapas tempranas del desarrollo. \cite{tla}
+TLA+ facilita la exploración de optimizaciones y modificaciones del protocolo, permitiendo iteraciones rápidas y evaluaciones de su impacto en la complejidad del estado. La experiencia de los ingenieros de Intel mostró que TLA+ es una herramienta poderosa para encontrar errores y mejorar la eficiencia de los diseños complejos en etapas tempranas del desarrollo.
 
 \subsection{Amazon}
-TLA+ se utilizó en Amazon Web Services (AWS) \cite{amazon} para corregir errores y mejorar la fiabilidad del sistema mediante especificación formal y verificación de modelos. En este caso, un desarrollador utilizó TLA+ para abordar un error sutil en un algoritmo que había pasado desapercibido a través de múltiples revisiones de diseño y código. A pesar de meses de pruebas, el error surgió sólo después de que el desarrollador escribiera una especificación en TLA+ y la ejecutara en el verificador de modelos TLC, que identificó rápidamente el problema. Esta detección exitosa de errores destacó la efectividad de TLA+ para descubrir defectos ocultos que los métodos de prueba tradicionales podrían pasar por alto.
+TLA+ se utilizó en Amazon Web Services (AWS) para corregir errores y mejorar la fiabilidad del sistema mediante especificación formal y verificación de modelos. En este caso, un ingeniero utilizó TLA+ para abordar un error sutil en un algoritmo que había pasado desapercibido en las etapas de revisión de diseño y código.
 
-% Amigos miren como separe el propiedades para forzar un salto de línea
-% es horrible pero no se por que se buggea y no salta automaticamente
-La fortaleza de TLA+ radica en su capacidad para describir tanto las propie-\\dades de corrección deseadas del sistema (el 'qué') como el diseño del sistema (el 'cómo'). Esto permite a los desarrolladores no solo verificar la corrección del sistema, sino también comprender su funcionamiento interno y realizar optimizaciones de rendimiento sin sacrificar la corrección. Debido al gran volumen de procesos que se realizan en los servidores de AWS, garantizar un código con la menor cantidad de bugs posible es esencial. Aunque un bug pueda parecer poco probable y tener una probabilidad de ocurrencia muy baja, la enorme cantidad de transacciones que se realizan diariamente hace que incluso estos casos poco probables puedan surgir. Por lo tanto, la capacidad de TLA+ para detectar y corregir incluso los errores más sutiles se vuelve crítica en un entorno donde la fiabilidad y la precisión son imperativas.
+La fortaleza de TLA+ radica en su capacidad para describir tanto las propie-\\dades de corrección deseadas del sistema (el 'qué') como el diseño del sistema (el 'cómo'). Esto permite a los ingenieros no solo verificar la corrección del sistema, sino también comprender su funcionamiento interno y realizar optimizaciones de rendimiento sin sacrificar la corrección. Debido al gran volumen de procesos que se realizan en los servidores de AWS, garantizar un código con la menor cantidad de bugs posible es esencial. Aunque un bug pueda parecer poco probable y tener una probabilidad de ocurrencia muy baja, la enorme cantidad de transacciones que se realizan diariamente hace que incluso estos casos poco probables puedan surgir. Por lo tanto, la capacidad de TLA+ para detectar y corregir incluso los errores más sutiles se vuelve crítica en un entorno donde la fiabilidad y la precisión son imperativas.
 
-Además, el éxito del uso de TLA+ para rectificar errores llevó a la dirección de AWS a abogar por su adopción en otros equipos que trabajaban en algoritmos y características críticas dentro del servicio S3. Los desarrolladores escribieron especificaciones formales para algoritmos adicionales y nuevas características, con el verificador de modelos ayudando a verificar las correcciones y prevenir la introducción de nuevos errores. La capacidad de enseñar rápidamente TLA+ a desarrolladores nuevos en la herramienta fue crucial para escalar su adopción dentro de la organización, demostrando su valor en mejorar la calidad del sistema y prevenir que errores graves lleguen a producción.
+El éxito del uso de TLA+ para rectificar errores llevó a la dirección de AWS a abogar por su adopción en otros equipos que trabajaban en algoritmos y características críticas dentro del servicio S3. La capacidad de enseñar rápidamente TLA+ a ingenieros nuevos en la herramienta fue crucial para escalar su adopción dentro de la organización, demostrando su valor al mejorar la calidad del sistema y prevenir que errores graves lleguen a producción.
 
-En la Tabla \ref{tab1} obtenida del paper podemos ver en qué sistemas dentro de AWS fue usado TLA+, y cómo le fue beneficioso.
+En la tabla \ref{tab1} obtenida del paper podemos ver en qué sistemas dentro de AWS fue usado TLA+, y cómo le fue beneficioso.
 
 \begin{table}
     \caption{Aplicaciones de TLA+ en Amazon.}\label{tab1}
     \setlength{\tabcolsep}{2pt} % Adjust column separation
     \begin{tabular}{|p{4.5em}|p{11em}|p{6em}|p{15em}|}
     \hline
-    Sistema & Componentes & Cantidad de líneas & Beneficio\\
+    {\bfseries Sistema} & {\bfseries Componentes} & {\bfseries Cantidad de líneas} & {\bfseries Beneficio}\\
     \hline
-    \multirow{2}{*}{S3} & Fault-tolerant low-level network algorithm & 804 PlusCal & Found 2 bugs. Found further bugs in proposed optimizations.\\
+    \multirow{2}{*}{S3} & Algoritmo de red de bajo nivel tolerante a fallas & 804 (PlusCal) & Encontró 2 bugs. Encontró más bugs en optimizaciones propuestas.\\
     \cline{2-4}
-     & Background redistribution of data & 645 PlusCal & Found 1 bug, and found a bug in the first proposed fix.\\
+     & Redistribución en segundo plano de data & 645 (PlusCal) & Encontró 1 bug, y encontró un bug en la primera propuesta de solución.\\
     \hline
-    \parbox{4em}{Dynamo DB} & Replication \& group & 939 TLA+ & Found 3 bugs, some requiring traces of 35 steps\\
+    \parbox{4em}{Dynamo DB} & Replicación y agrupamiento & 939 (TLA+) & Encontró 3 bugs, algunos requiriendo trazas de 35 pasos.\\
     \hline
-    EBS & Volume management & 102 PlusCal & Found 3 bugs.\\
+    EBS & Manejo de volúmenes & 102 (PlusCal) & Encontró 3 bugs.\\
     \hline
-    \multirow{2}{*}{\parbox{4em}{Internal distributed\\lock manager}} & Lock-free data structure & 223 PlusCal & Improved confidence. Failed to find a liveness bug as we did not check liveness.\\
+    \multirow{2}{*}{\parbox{4em}{Manejador interno de distribución de locks}} & Estructura de datos sin lock & 223 (PlusCal) & Incrementó la confianza. No encontró un bug de liveness ya que no se chequeaba liveness (esto no se si vale la pena ponerlo o no)\\
     \cline{2-4}
-     & Fault tolerant replication and reconfiguration algorithm & 318 TLA+ & Found 1 bug. Verified an aggressive optimization. \\
+     & Algoritmo de replicación y reconfiguración tolerante a fallas & 318 (TLA+) & Encontró 1 bug. Verificó una optimización agresiva. \\
     \hline
     \end{tabular}
 \end{table}
- 
-\subsection{Elasticsearch}
-En la versión 6.2 de ElasticSearch se detectó un bug \cite{elastic_search} que dejaba documentos borrados sin eliminar accesibles si se tenía acceso seguro, un valor booleano compartido, al momento de la operación, y el sistema de mapeo de versiones era vulnerable a cambios en este valor que permitía leer el documento eliminado. De modo que fueron reportados casos por usuarios que encontraron documentos con la misma clave primaria, tras hacer llamadas a sus APIs de indexación y eliminación de documentos consecutivamente. 
-
-Estos casos fueron detectados por TLC en un modelo formal realizado por los propios desarrolladores del sistema de indexación y eliminación de documentos replicados. Pudieron solucionar el problema eliminando estos documentos cuando hayan sido re-indexados, sin importar la condición del valor de acceso seguro. Con esto pudieron pasar las pruebas de TLC sobre terminación del proceso
-
-\begin{equation}
-    Terminated \triangleq \forall self \in ProcSet: pc[self] = "Done"
-\end{equation}
-donde $ProcSet$ es el conjunto de procesos, $pc$ es el contador de programa de cada proceso, y $"Done"$ es el estado final del proceso.
-
-Y el invariante de unicidad de documentos
-\[
-\begin{aligned}
-    &Invariant \triangleq Terminated \implies \\
-    &\phantom{Inv} \land expected\_doc = NULL \implies lucene\_document = NULL \\ 
-    &\phantom{Inv} \land expected\_doc \neq NULL \implies lucene\_document.content = expected\_doc
-\end{aligned}
-\]
-
-donde $expected\_doc$ es el documento esperado, y $lucene\_document$ es el documento en el sistema de indexación.
 
 
 \subsection{Prueba de un algoritmo tolerante a demoras y fallas de renombre de procesos}
-En el marco de la computación paralela, se ha realizado un trabajo \cite{case_study} de análisis y verificación de un algoritmo no bloqueante y tolerante a fallas de renombre de procesos en un sistema de memoria compartido. Esto permite probar propiedades de safety y liveness sobre el sistema. En particular se probó la siguiente propiedad de corrección, 
+En el marco de la computación paralela, se ha realizado un trabajo de análisis y verificación de un algoritmo no bloqueante y tolerante a fallas de renombre de procesos en un sistema de memoria compartido. Esto permite probar propiedades de safety y liveness sobre el sistema. En particular se probó la siguiente propiedad de corrección, 
 \begin{equation}
     \forall p, q \in Proc, p \neq q, \square(name_p \neq \bot \land name_q \neq \bot \implies name_p \neq name_q)
 \end{equation}
@@ -170,27 +177,155 @@ Además se proveen las pruebas pertinentes de corrección y completitud de los s
     &\land \exists p \in \text{Proc}, \text{dir}_p \neq \text{down}
 \end{aligned} \right)
 \]
-y
+que dice que los procesos son dirigidos en alguna dirección, derecha y abajo, con fairness en ambas, y que solo se tiene un proceso asignado al nombre de ese splitter.
 
 \[
     \forall p \in Proc, \square(p\ entra\ al\ splitter \implies \lozenge(dir_p \in \{stop, down, right\})))    
 \]
 
-respectivamente.
+que cada proceso que entra al splitter es direccionado a alguna de estas categorias eventualmente.
+
 El modelo y prueba de estas propiedades consisten en 2000 líneas de TLAPS para el algoritmo, y 200 líneas por el splitter, con un total de 70 lemas y teoremas, y 963 pasos de prueba. Las pruebas del splitter consisten en 93 obligaciones de prueba, entre ellas 43 obvias y descartadas por TLAPM (el manejador de pruebas de TLA+), y las otras 50 resueltas con motores de prueba SMT (CVC3, VeriT y Z3 fueron usados).
 
 \section{Caso de aplicación de la herramienta}
-A continuación desarrollamos un caso de aplicación completo donde podemos ver cómo se utiliza TLA+ y su verificador TLC para encontrar un bug en un proceso concurrente real.
+Se desarrolla a continuación un caso de aplicación completo donde podemos ver cómo se utiliza TLA+ y su verificador TLC para encontrar un bug en un proceso concurrente real.
 
-Se trata de un modelo de gestor de tareas, creado por el desarrollador Andreas Stührk para la empresa donde trabaja. El mismo debe mantener actualizado el estado de realización de los trabajos encomendados, y encargarse de la realización concurrente de las mismas. El sistema tenía un bug de consistencia en el supervisor de trabajos, y es que a veces no se percibía el cambio de ‘pendiente’ a ‘completo’ correctamente. Por lo que se desarrolló la especificación de las partes del sistema existente con TLA+, particularmente usando su lenguaje de pseudocódigo asociado PlusCal también, y fueron chequeadas invariantes de correctitud y progreso con TLC.
+Se trata de un modelo de gestor de tareas, creado por el desarrollador Andreas Stührk para la empresa donde trabaja. El mismo debe mantener actualizado el estado de realización de los trabajos encomendados, y asegurarse de que esto se gestione de manera concurrente. El sistema tenía un bug de consistencia en el supervisor de trabajos, y es que a veces no se percibía el cambio de ‘pendiente’ a ‘completo’. Entonces, desarrolló la especificación de las partes del sistema existente con TLA+, apoyándose también en el lenguaje de pseudocódigo asociado PlusCal, y chequeando invariantes de correctitud y progreso con TLC.
 
-Cada trabajo consiste en la completitud de tareas independientes. El sistema consiste de un supervisor de progreso, que toma los mensajes de status de tareas de una cola FIFO conectada a las unidades de procesamiento y decide si el trabajo está completo, y guarda la información del progreso en nodos en una unidad de almacenamiento (Cassandra). Esta unidad implementa factores de replicación y niveles de consistencia para asegurar que los datos sean replicados y leídos de manera confiable entre múltiples nodos. En la figura 1 se puede ver un diagrama de la arquitectura del sistema. 
+Cada trabajo consiste en la completitud de tareas independientes. El sistema, a su vez, se compone de un supervisor de progreso, que toma los mensajes de estado de tareas de una cola FIFO conectada a las unidades de procesamiento, y decide si el trabajo está completo, almacenando la información del progreso en nodos en una unidad de almacenamiento (Cassandra). Esta unidad implementa factores de replicación y niveles de consistencia para asegurar que los datos sean replicados y leídos de manera confiable entre múltiples nodos. En Figura \ref{caso_estudio} se puede ver un diagrama de la arquitectura del sistema. 
 
-\begin{figure}[t]
-    \caption{Arquitectura del sistema gestor de tareas.}\label{sistema}
-    \includegraphics[width=8cm]{formalizing-the-system.png}
+\begin{figure}
+    \caption{Arquitectura del sistema gestor de tareas.}\label{caso_estudio}
+    \includegraphics[width=5cm]{formalizing-the-system.png}
     \centering
 \end{figure}
+
+En este trabajo se simplificó al máximo el modelo del sistema para atacar el problema de consistencia observado, modelando únicamente la operación de tomar un elemento de la cola, como se ve a continuación:
+
+\begin{lstlisting}
+EXTENDS Sequences, TLC
+
+\* Receive a message from the queue
+macro recv(queue, receiver)
+begin
+  await queue # <<>>;
+  receiver := Head(queue);
+  queue := Tail(queue);
+end macro
+\end{lstlisting}
+
+Para el modelo de Cassandra se supone que tiene implementada la replicación automática de información en segundo plano, y que ésta funciona bien, entonces  el modelo del nivel de consistencia consiste en escribir el mismo dato en los nodos especificados así:
+
+\begin{lstlisting}
+procedure appendProgress(writeNodes, status)
+variable nodes = writeNodes;
+begin P0:
+  while (nodes # {}) do
+  P1:
+    with n \in nodes do
+      progress[n] := progress[n] \union {status};
+      nodes := nodes \ {n};
+    end with
+  end while;
+  return;
+end procedure
+\end{lstlisting}
+
+La lectura de nodos:
+\begin{lstlisting}
+ReadProgress(nodes) == UNION {progress[n] : n \in nodes}
+\end{lstlisting}
+
+Y el supervisor
+\begin{lstlisting}
+\* Handles a progress message from the queue
+fair process progressHandler \in {"handler1", "handler2"}
+variable
+    writeQuorumNodes \in NNodes(Quorum),
+    readQuorumNodes \in NNodes(Quorum),
+    secondReadQuorumNodes \in NNodes(Quorum),
+    completedBefore = FALSE,
+    message = "";
+begin P0:
+    while TRUE do
+    Poll:
+    recv(queue, message);
+    unacked := unacked + 1;
+    Read:
+    completedBefore := ProcessingComplete(ReadProgress(readQuorumNodes));
+    Write:
+    call appendProgress(writeQuorumNodes, message);
+    ReadAfterWrite:
+    if ~completedBefore /\ ProcessingComplete(ReadProgress(secondReadQuorumNodes)) then
+        \* The real progress handler would trigger some action here
+        switchHappened := switchHappened + 1;
+    end if;
+    Ack:
+    unacked := unacked - 1;
+    end while;
+end process;    
+\end{lstlisting}
+
+donde $unacked$ lleva la cuenta de mensajes procesandose por el supervisor, $switchHappened$ la cantidad de veces que se cambia el estado de ‘pendiente’ a ‘completo’ de un trabajo, $queue$ la cola de mensajes con tareas completas por las unidades de procesamiento. El código completo se puede ver especificado acá.
+
+Podemos entonces definir las propiedades a verificar en el modelo, que son el invariante de correctitud, que asegura que o bien quedan tareas aún no procesadas como completas (cola no vacía), o bien el manejador está procesando un mensaje de status (unacked > 0), o bien ya se ha completado el trabajo y se puede visualizar en el supervisor (switchHappened > 0).
+\begin{lstlisting}
+Correctness == \/ queue # <<>>
+                \/ unacked > 0
+                \/ switchHappened > 0    
+\end{lstlisting}
+
+Y por otro lado la propiedad de progreso esperada, que el supervisor cambia de estado eventualmente.
+
+\begin{lstlisting}
+Liveness == <>[](switchHappened > 0)
+\end{lstlisting}
+
+Con este diseño y un poco de logging en la implementación se pudo reportar un error. En el diseño del sistema se puede demostrar que es necesario hacer lecturas y escrituras por quórum en los nodos de Cassandra, esto quiere decir que no se puede confiar en la lectura de un solo nodo, ya que éste puede no haber sido actualizado por algún interleaving con otra lectura del proceso. Al analizar más profundamente, se descubrió que en la implementación real, las lecturas de la base de datos no usaban niveles de consistencia de quórum correctamente.
+
+El código usa Java con la librería Datastax Cassandra Driver y prepared statements. Los statements son creados así:
+\begin{lstlisting}[language=Java]
+Statement insert = QueryBuilder
+.insertInto(keyspace, columnFamily)
+// Omitted: binding expressions for the values here ...
+.setConsistencyLevel(consistencyLevel);
+
+return session.prepare(insert.toString());
+\end{lstlisting}
+
+El bug se encuentra en esta sección, ya que no se incluye la propiedad del nivel de consistencia en la representación en string de la consulta, por lo que el cambio
+\begin{lstlisting}
+Statement insert = QueryBuilder
+.insertInto(keyspace, columnFamily)
+// Omitted: binding expressions for the values here
+return session
+.prepare(insert.toString());
+.setConsistencyLevel(consistencyLevel);
+\end{lstlisting}
+
+resuelve el problema.
+
+Por otra parte, es posible ver una limitación en el diseño, ya que no puede probarse la propiedad 
+NoDupSwitch == switchHappened <= 1
+que especifica que el cambio de estado de ‘pendiente’ a ‘completo’ se observa a lo sumo una vez, y en conjunción con Liveness obtendremos como resultado que se realiza exactamente una vez. Esta especificación no es suficiente para asegurar eso, lo cual implica el riesgo de realizar dos o más veces el mismo trabajo.
+
+
+\section{Conclusiones}
+
+TLA+ es acesible para aquellos con conocimientos básicos en lógica y teoría de conjuntos. Tiene una sintaxis que simula la matemática clásica, y el model checker tiene un funcionamiento muy similar a otros del mismo nivel de expresividad.
+
+TLAPS puede resultar más complejo de manjear que TLA+, ya que hay que definir el contexto adecuado de prueba de un teorema, lo cual puede requerir de un esfuerzo considerable, sobre todo si no se tiene una idea de la validez del diseño desde el principio. 
+
+La instalación de TLA+ y sus herramientas asociadas es generalmente sencilla y bien documentada.
+
+Las herramientas de TLA+ pueden ser muy útiles para la corrección de diseño (tendo dudas acá). Según la experiencia de expertos, estas herramientas han sido efectivas en la identificación de bugs que podrían haber pasado desapercibidos con métodos de testing convencionales.
+
+TLA+ puede verificar programas de diversos tipos, demostrando su versatilidad y adaptabilidad a diferentes contextos y necesidades en el desarrollo de sistemas.
+
+En general, TLA+ y TLAPS son herramientas poderosas que, a pesar de su potencial complejidad inicial en ciertos aspectos, se presentan como una herramientas altamente recomendables para aquellos involucrados en el diseño y verificación de sistemas, debido a su capacidad para mejorar la calidad y fiabilidad de los sistemas desarrollados. 
+
+
+
 
 
 \begin{thebibliography}{8}
@@ -202,6 +337,9 @@ TLA+ Proof System, \url{https://proofs.tlapl.us/doc/web/content/Home.html}, últ
 
 \bibitem{tla}
 The TLA+ Home Page, \url{https://lamport.azurewebsites.net/tla/tla.html}, último acceso 2024/05/28
+
+\bibitem{tla_history}
+TLA+ in Practice and Theory. Part 1: The Principles of TLA+, \url{https://pron.github.io/posts/tlaplus_part1}, último acceso 2024/05/30
 
 \bibitem{case_study}
 Finding bugs in systems through formalization, \url{https://andy.hammerhartes.de/finding-bugs-in-systems-through-formalization.html}, último acceso 2024/05/28
