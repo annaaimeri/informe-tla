@@ -9,6 +9,7 @@
 \usepackage{listings}
 \usepackage{color}
 \usepackage{wrapfig}
+\usepackage{hyperref}
 
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
@@ -73,9 +74,7 @@ Las especificaciones en TLA+ suelen tener el siguiente formato:
 
 $Action_{i}$ representa una acción, que se puede expresar como una conjunción de precondiciones y postcondiciones, donde la postcondición en general usa el valor de una variable en el próximo estado para describir la acción que se puede realizar dadas las precondiciones. \textit{Init} es el predicado de estado inicial, \textit{Next} es el predicado del siguiente estado válido, y \textit{Spec} es la especificación completa del sistema, que incluye el estado inicial, la relación de transición y condiciones de fairness, que puede ser débil o fuerte. Dada una acción A, la condición de fairness débil \textit{WF(A)} asegura que si A es habilitada permanentemente a partir de un estado, i.e. se cumplen las precondiciones de A, entonces A se ejecutará infinitas veces. La condición de fairness fuerte \textit{SF(A)} asegura que si A es habilitada frecuentemente a lo largo de una traza de estados, entonces A se ejecutará infinitas veces. El subíndice $\langle vars \rangle$ en \textit{Next} indican que puede darse que ninguna de esas variables cambien en un estado, y en las propiedades de fairness significa que el progreso debe darse para todas las variables del conjunto. 
 
-Además, es posible con TLA+ formular teoremas y diseñar pruebas formales sobre propiedades de estas especificaciones en TLAPS. Un caso general puede enunciarse de la siguiente forma:
-
-donde definimos un teorema que permite probar Property a partir de la especificación, asistiendo la demostración con el contexto necesario para los motores de prueba, como la definición de Spec y propiedades básicas de lógica temporal proposicional.
+Además, es posible con TLA+ formular teoremas y diseñar pruebas formales sobre propiedades de estas especificaciones en TLAPS. Un caso general puede enunciarse de la forma de arriba, donde definimos un teorema que permite probar Property a partir de la especificación, asistiendo la demostración con el contexto necesario para los motores de prueba, como la definición de Spec y propiedades básicas de lógica temporal proposicional.
 
 Los modelos en TLA+ y su verificación en TLC ponen su foco en el comportamiento del sistema, abstrayéndose de los detalles de su implementación. Es por esto que son independientes de cualquier lenguaje de programación, y no es necesario anotar el programa. Sin embargo, es posible anotar el algoritmo usando el pseudo-código PlusCal, un lenguaje formal que se transpila a TLA+, para probar propiedades sobre sus variables. A diferencia del enfoque orientado a acciones, PlusCal se asemeja más a un lenguaje de programación imperativo y es más adecuado para especificar algoritmos secuenciales.
 
@@ -152,7 +151,7 @@ begin P0:
 end process;    
 \end{lstlisting}
 
-donde $unacked$ lleva la cuenta de mensajes procesandose por el supervisor, $switchHappened$ la cantidad de veces que se cambia el estado de ‘pendiente’ a ‘completo’ de un trabajo, y $queue$ la cola de mensajes con tareas completas por las unidades de procesamiento.
+donde $unacked$ lleva la cuenta de mensajes procesandose por el supervisor, $switchHappened$ la cantidad de veces que se cambia el estado de ‘pendiente’ a ‘completo’ de un trabajo, y $queue$ la cola de mensajes con tareas completas por las unidades de procesamiento. El código completo de especificación se puede ver \href{https://github.com/Trundle/PlusCal/blob/master/progress/progress.tla}{acá}.
 
 Podemos entonces definir las propiedades a verificar en el modelo. En primer lugar, el invariante de correctitud, que asegure que o bien quedan tareas aún no procesadas como completas (cola no vacía), o bien el manejador está procesando un mensaje de status (\(unacked > 0\)), o bien ya se ha completado el trabajo y se puede visualizar en el supervisor (\(switchHappened > 0\)). Definimos además, la propiedad de progreso esperada, que denote que el supervisor cambia de estado eventualmente.
 
@@ -225,11 +224,13 @@ Finding bugs in systems through formalization, \url{https://andy.hammerhartes.de
 \bibitem{amazon}
 Chris N., Tim R., Fan Z., Bogdan M., Marc B., Michael D.: Use of Formal Methods at Amazon Web Services. Amazon.com, 29th September, 2014
 
-\bibitem{elastic_search}
-Possible to index duplicate documents with same id and routing id, \url{https://github.com/elastic/elasticsearch/issues/31976#issuecomment-404722753}
-
 \bibitem{book}
 Leslie L.: Specifying Systems: The TLA+ Language and Tools for Hardware and Software Engineers. Addison-Wesley Professional, 2002
+
+\bibitem{intel}
+Intel Corporation: Using TLA+ to Design and Verify a Cache Coherence Protocol. Intel Corporation, 2008
+\url{https://lamport.azurewebsites.net/tla/industrial-use.html}
+
 
 \end{thebibliography}
 \end{document}
