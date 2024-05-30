@@ -180,29 +180,8 @@ Cada trabajo consiste en la completitud de tareas independientes. El sistema, a 
 
 En este trabajo se simplificó al máximo el modelo del sistema para atacar el problema de consistencia observado, modelando únicamente la operación de tomar un elemento de la cola.
 
-Para el modelo de Cassandra se asume la implementación y correcto funcionamiento de la replicación automática de información en segundo plano. Luego, el modelo del nivel de consistencia consiste en escribir el mismo dato en los nodos especificados así:
+Para el modelo de Cassandra se asume la implementación y correcto funcionamiento de la replicación automática de información en segundo plano. Luego, el modelo del nivel de consistencia consiste en escribir el mismo dato en los nodos especificados. La lectura de nodos se modela con la función $ReadProgress(nodes)$ como la unión de los progresos de $nodes$. A continuación se muestra el diseño del supervisor.
 
-\begin{lstlisting}
-procedure appendProgress(writeNodes, status)
-variable nodes = writeNodes;
-begin P0:
-  while (nodes # {}) do
-  P1:
-    with n \in nodes do
-      progress[n] := progress[n] \union {status};
-      nodes := nodes \ {n};
-    end with
-  end while;
-  return;
-end procedure
-\end{lstlisting}
-
-La lectura de nodos:
-\begin{lstlisting}
-ReadProgress(nodes) == UNION {progress[n] : n \in nodes}
-\end{lstlisting}
-
-Y el supervisor
 \begin{lstlisting}
 \* Handles a progress message from the queue
 fair process progressHandler \in {"handler1", "handler2"}
@@ -232,7 +211,7 @@ begin P0:
 end process;    
 \end{lstlisting}
 
-donde $unacked$ lleva la cuenta de mensajes procesandose por el supervisor, $switchHappened$ la cantidad de veces que se cambia el estado de ‘pendiente’ a ‘completo’ de un trabajo, y $queue$ la cola de mensajes con tareas completas por las unidades de procesamiento.
+donde $writeQuorumNodes$ representa los nodos donde se desea escribir la actualización del progreso, $readQuorumNodes$ el conjunto de nodos de donde se lee el progreso del trabajo en un instante, $secondReadQuorumNodes$ el conjunto de lectura en el instante siguiente, y $unacked$ lleva la cuenta de mensajes procesandose por el supervisor, $switchHappened$ la cantidad de veces que se cambia el estado de ‘pendiente’ a ‘completo’ de un trabajo, y $queue$ la cola de mensajes con tareas completas por las unidades de procesamiento.
 
 Podemos entonces definir las propiedades a verificar en el modelo. En primer lugar, el invariante de correctitud, que asegure que o bien quedan tareas aún no procesadas como completas (cola no vacía), o bien el manejador está procesando un mensaje de status (unacked > 0), o bien ya se ha completado el trabajo y se puede visualizar en el supervisor (switchHappened > 0). Definimos además, la propiedad de progreso esperada, que denote que el supervisor cambia de estado eventualmente.
 %
