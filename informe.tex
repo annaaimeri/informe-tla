@@ -41,7 +41,19 @@ El lenguaje de especificación de modelos TLA+ es un lenguaje formal que combina
 
 El lenguaje de propiedades de TLA+ se basa en la lógica de acciones temporales (TLA). Esta lógica combina la lógica temporal con una lógica de acciones, proporcionando constructores que incluyen predicados sobre estados iniciales, relaciones de transición entre estados sucesivos y condiciones de fairness para garantizar un progreso adecuado en el sistema.
 
-TLA+ permite realizar un análisis exhaustivo de propiedades críticas, como la detección de deadlocks, y el análisis de progreso, garantizando que el sistema avance hacia estados deseados. Además, TLA+ facilita la verificación de invariantes, propiedades que deben mantenerse verdaderas en todos los estados alcanzables del sistema, a través de fórmulas especificadas en los archivos de configuración. También permite el control de fairness, mediante la conjunción de fórmulas temporales que definen las condiciones de liveness del sistema. (\textbf{EJEMPLO: esquema basico de especificacion en TLA}). Los análisis se realizan evaluando predicados de estado inicial y acciones de siguiente estado especificadas, utilizando evaluaciones para eliminar posibles transiciones o estados, garantizando una revisión completa y precisa del comportamiento del sistema bajo diferentes condiciones. 
+TLA+ permite realizar un análisis exhaustivo de propiedades críticas, como la detección de deadlocks, y el análisis de progreso, garantizando que el sistema avance hacia estados deseados. Además, TLA+ facilita la verificación de invariantes, propiedades que deben mantenerse verdaderas en todos los estados alcanzables del sistema, a través de fórmulas especificadas en los archivos de configuración. También permite el control de fairness, mediante la conjunción de fórmulas temporales que definen las condiciones de liveness del sistema. En general en TLA+ estas especificaciones se traducen en el siguiente formato
+\[
+\begin{aligned}
+    & Action_1 \triangleq \land_{i=1}^{m_1} Pre_i \land_{i=1}^{k_1} Next_i \\
+    \dots \\
+    & Action_n \triangleq \land_{i=1}^{m_n} Pre_i \land_{i=1}^{k_n} Next_i \\
+    & Init \triangleq \land_{i=1}^{m_i} P_{var_i} \\
+    & Next \triangleq \lor_{i=1}^{n} Action_i \\
+    & Spec \triangleq Init \land \square [Next]_{\langle vars \rangle} \land WF_{\langle vars \rangle}(Action)
+\end{aligned}
+\]
+
+$Action_{i}$ representa una acción, que se puede expresar como una conjunción de precondiciones y postcondiciones, donde la postcondición en general usa el valor de una variable en el próximo estado para describir la acción que se puede realizar dadas las precondiciones de las variables. \textit{Init} es el predicado de estado inicial, \textit{Next} es el predicado del siguiente estado válido de la especificación, y \textit{Spec} es la especificación completa del sistema, que incluye el estado inicial, la relación de transición y condiciones de fairness, que puede ser débil o fuerte. Dada una acción A, la condición de fairness débil \textit{WF(A)} asegura que si A es habilitada permanentemente a partir de un estado, i.e. se cumplen las precondiciones de A, entonces A se ejecutará infinitas veces. La condición de fairness fuerte \textit{SF(A)} asegura que si A es habilitada frecuentemente a lo largo de una traza de estados, entonces A se ejecutará infinitas veces. El subíndice $\langle vars \rangle$ en \textit{Next} indican que puede darse que ninguna de esas variables cambien en un estado, y en las propiedades de fairness significa que el progreso debe darse para todas las variables del conjunto. 
 
 Además, es posible con TLA+ formular teoremas y diseñar pruebas formales sobre propiedades de estas especificaciones en TLAPS. (\textbf{AGREGAR MAS SOBRE TLAPS)}
 
@@ -123,15 +135,9 @@ Estos casos fueron detectados por TLC en un modelo formal realizado por los prop
 \begin{equation}
     Terminated \triangleq \forall self \in ProcSet: pc[self] = "Done"
 \end{equation}
+donde $ProcSet$ es el conjunto de procesos, $pc$ es el contador de programa de cada proceso, y $"Done"$ es el estado final del proceso.
 
 Y el invariante de unicidad de documentos
-% \begin{align*}
-%     & Invariant \triangleq Terminated \implies \\
-%     & \land expected\_doc = NULL \implies lucene\_document = NULL \\ 
-%     & \land expected\_doc \neq NULL \implies lucene\_document.content = expected\_doc
-% \end{align*}
-% Dejo esto que me compiló en overleaf pero no tengo el compilador asi que comentado
-% esta como estaba antes jiij
 \[
 \begin{aligned}
     &Invariant \triangleq Terminated \implies \\
@@ -139,6 +145,8 @@ Y el invariante de unicidad de documentos
     &\phantom{Inv} \land expected\_doc \neq NULL \implies lucene\_document.content = expected\_doc
 \end{aligned}
 \]
+
+donde $expected\_doc$ es el documento esperado, y $lucene\_document$ es el documento en el sistema de indexación.
 
 
 \subsection{Prueba de un algoritmo tolerante a demoras y fallas de renombre de procesos}
