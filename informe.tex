@@ -67,7 +67,7 @@ El lenguaje de propiedades de TLA+ se basa en la lógica de acciones temporales 
 
 TLA+ permite realizar un análisis exhaustivo de propiedades críticas, como la detección de deadlocks, y el análisis de progreso. Además, TLA+ facilita la verificación de invariantes a través de fórmulas especificadas en los archivos de configuración. También permite el control de fairness, mediante la conjunción de fórmulas temporales que definen las condiciones de liveness del sistema. Las especificaciones en TLA+ suelen tener el siguiente formato:
 %
-\begin{wrapfigure}[8]{l}{8cm}
+% \begin{wrapfigure}[8]{l}{8cm}
 \begin{footnotesize}
 \[
 \begin{aligned}
@@ -80,7 +80,7 @@ TLA+ permite realizar un análisis exhaustivo de propiedades críticas, como la 
 \end{aligned}
 \]
 \end{footnotesize}
-\end{wrapfigure}
+% \end{wrapfigure}
 %
 $Action_{i}$ representa una acción, que se puede expresar como una conjunción de precondiciones y postcondiciones, donde la postcondición en general usa el valor de una variable en el próximo estado para describir la acción que se puede realizar dadas las precondiciones. \textit{Init} es el predicado de estado inicial, \textit{Next} es el predicado del siguiente estado válido, y \textit{Spec} es la especificación completa del sistema, que incluye el estado inicial, la relación de transición y condiciones de fairness, que puede ser débil o fuerte. Dada una acción A, la condición de fairness débil \textit{WF(A)} asegura que si A es habilitada permanentemente a partir de un estado, i.e. se cumplen las precondiciones de A, entonces A se ejecutará infinitas veces. La condición de fairness fuerte \textit{SF(A)} asegura que si A es habilitada frecuentemente a lo largo de una traza de estados, entonces A se ejecutará infinitas veces. El subíndice $\langle vars \rangle$ en \textit{Next} indican que puede darse que ninguna de esas variables cambien en un estado, y en las propiedades de fairness significa que el progreso debe darse para todas las variables del conjunto. 
 
