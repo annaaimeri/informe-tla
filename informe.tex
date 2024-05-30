@@ -14,7 +14,7 @@
 \maketitle              % typeset the header of the contribution
 %
 \begin{abstract}
-Presentamos un set de herramientas sobre el lenguaje de especificación de modelos TLA+, que nos permite corregir el diseño de un sistema mediante la especificación de un modelo, y demostrar propiedades sobre sus comportamientos posibles mediante el uso de motores de prueba sobre lógica temporal de acciones. Desarrollaremos características de la interfaz de usuario, el mecanismo de chequeo del modelo y especificaciones,  y casos de aplicación en la industria por grandes tecnológicas, desde procesos de sistemas operativos en tiempo real hasta sistemas de almacenamiento distribuidos.
+Se presenta un set de herramientas sobre el lenguaje de especificación de modelos TLA+, que permite corregir el diseño de un sistema mediante la especificación de un modelo, y demostrar propiedades sobre sus comportamientos posibles mediante el uso de motores de prueba sobre lógica temporal de acciones. Se desarrollan características de la interfaz de usuario, el mecanismo de chequeo del modelo y especificaciones,  y casos de aplicación en la industria por grandes tecnológicas, desde procesos de sistemas operativos en tiempo real hasta sistemas de almacenamiento distribuidos.
 \end{abstract}
 
 \section{Introducción}
@@ -53,6 +53,9 @@ Los errores más difíciles de localizar son aquellos que TLC detecta al evaluar
 
 El verificador de modelos TLC permite la simulación de comportamientos del sistema. En modo de simulación, TLC construye y verifica repetidamente comportamientos individuales con una longitud máxima fija.
 
+% opinion seba: a este parrafo capaz lo sacaría lpm
+% como que ya nos metemos con como funciona por detras creo no? no tanto la UI
+% capaz mergearlo con el primero y/o segundo de asp tecnicos
 Para crear y verificar un comportamiento, TLC sigue un procedimiento similar al de construir el grafo G (\textbf{CUIDADO:} Acá hablamos del “grafo g” antes de definirlo), pero con una diferencia clave; después de calcular el conjunto de estados iniciales y el conjunto de sucesores para un estado dado, TLC elige pseudo-aleatoriamente un elemento de ese conjunto. Si el elemento no cumple con la restricción especificada, TLC detiene la computación de G. De lo contrario, TLC incluye ese estado en G y verifica las fórmulas de invarianza para ese estado. La construcción de G se detiene cuando se genera el número máximo especificado de estados.
 
 \section{Aspectos técnicos}
