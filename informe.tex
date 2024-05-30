@@ -33,7 +33,7 @@
 }
 
 \begin{document}
-\title{TLA+}
+\title{TLA+ Proof System}
 \author{Anna Aimeri, Sebastián José Giraudo, Valentín Negrelli}
 \institute{Facultad de Matemática, Astronomía, Física y Computación, Av. Medina Allende s/n, Córdoba, Argentina}
 \maketitle             
@@ -103,12 +103,12 @@ TLAPS ofrece muchas opciones para configurar timeouts, orden de solvers, y demá
 \paragraph{Intel}
 En Intel, TLA+ y TLC se han utilizado para diseñar y verificar protocolos de coherencia de caché en procesadores multinúcleo, en particular para los procesadores Alpha EV7 y EV8. En el caso de EV8 en particular, la especificación fue completada antes de que el diseño fuera estable, lo que brindó feedback temprano sobre la viabilidad del sistema a los diseñadores.
 
-TLA+ facilita la exploración de optimizaciones y modificaciones del protocolo, permitiendo iteraciones rápidas y evaluaciones de su impacto en la complejidad del estado. La experiencia de los ingenieros de Intel mostró que TLA+ es una herramienta poderosa para encontrar errores y mejorar la eficiencia de los diseños complejos en etapas tempranas del desarrollo.
+TLA+ facilita la exploración de optimizaciones y modificaciones del protocolo, permitiendo iteraciones rápidas y evaluaciones de su impacto en la complejidad del estado. La experiencia de los ingenieros de Intel mostró que TLA+ es una herramienta poderosa para encontrar errores y mejorar la eficiencia de los diseños complejos en etapas tempranas del desarrollo.\cite{intel}
 
 \paragraph{Amazon}
 TLA+ se utiliza en Amazon Web Services (AWS) para corregir errores y mejorar la fiabilidad de diversos sistemas. El uso de herramientas de especificación formal y verificación de modelos permitió a los ingenieros verificar la corrección del sistema, comprender su funcionamiento interno y realizar optimizaciones de rendimiento sin sacrificar la corrección. La lista de proyectos donde Amazon utiliza esta herramienta incluye S3, DynamoDB, EBS (Elastic Block Store).
 
-Debido al gran volumen de procesos que se realizan en los servidores de AWS, garantizar un código con la menor cantidad de bugs posible es esencial. Aunque un bug pueda parecer poco probable y tener una probabilidad de ocurrencia muy baja, la enorme cantidad de transacciones que se realizan diariamente hace que incluso estos casos poco probables puedan surgir. Es por esto que la capacidad de TLA+ para detectar y corregir incluso los errores más sutiles se vuelve crítica en un entorno donde la fiabilidad y la precisión son imperativas.
+Debido al gran volumen de procesos que se realizan en los servidores de AWS, garantizar un código con la menor cantidad de bugs posible es esencial. Aunque un bug pueda parecer poco probable y tener una probabilidad de ocurrencia muy baja, la enorme cantidad de transacciones que se realizan diariamente hace que incluso estos casos poco probables puedan surgir. Es por esto que la capacidad de TLA+ para detectar y corregir incluso los errores más sutiles se vuelve crítica en un entorno donde la fiabilidad y la precisión son imperativas.\cite{amazon}
 
 \paragraph{Prueba de un algoritmo tolerante a demoras y fallas de renombre de procesos}
 En el marco de la computación paralela, se ha realizado un trabajo de análisis y verificación de un algoritmo no bloqueante y tolerante a fallas de renombre de procesos en un sistema de memoria compartido. Esto permite probar propiedades de safety y liveness sobre el sistema. En particular, se probó una propiedad que indica que cada proceso obtiene un nombre único, y otra que muestra que cada proceso que entra al sistema obtiene un nombre. Se realizaron, además, las pruebas pertinentes de corrección y completitud de los splitters, objetos que se utilizan para la sincronización de acciones sin bloqueo. Estas pruebas mostraban que los procesos son dirigidos en alguna dirección, derecha y abajo, con fairness en ambas, que solo se tiene un proceso asignado al nombre de ese splitter, y, finalmente, que cada proceso que entra al splitter es direccionado a alguna de estas categorias eventualmente.
@@ -151,16 +151,16 @@ begin P0:
 end process;    
 \end{lstlisting}
 
-donde $unacked$ lleva la cuenta de mensajes procesandose por el supervisor, $switchHappened$ la cantidad de veces que se cambia el estado de ‘pendiente’ a ‘completo’ de un trabajo, y $queue$ la cola de mensajes con tareas completas por las unidades de procesamiento. El código completo de especificación se puede ver \href{https://github.com/Trundle/PlusCal/blob/master/progress/progress.tla}{acá}.
+donde $unacked$ lleva la cuenta de mensajes procesandose por el supervisor, $switchHappened$ la cantidad de veces que se cambia el estado de ‘pendiente’ a ‘completo’ de un trabajo, y $queue$ la cola de mensajes con tareas completas por las unidades de procesamiento. El código completo de especificación se puede ver en 
+\cite{caso_de_estudio}.
+% ToDo cambiar el nombre de esa cita en la bibliografia
 
 Podemos entonces definir las propiedades a verificar en el modelo. En primer lugar, el invariante de correctitud, que asegure que o bien quedan tareas aún no procesadas como completas (cola no vacía), o bien el manejador está procesando un mensaje de status (\(unacked > 0\)), o bien ya se ha completado el trabajo y se puede visualizar en el supervisor (\(switchHappened > 0\)). Definimos además, la propiedad de progreso esperada, que denote que el supervisor cambia de estado eventualmente.
-
-\begin{wrapfigure}[6]{l}{6.5cm}
+\begin{wrapfigure}[5]{l}{6.5cm}
 \begin{lstlisting}
 Correctness == \/ queue # <<>>
                  \/ unacked > 0
                  \/ switchHappened > 0    
-
 Liveness == <>[](switchHappened > 0)
 \end{lstlisting}
 \end{wrapfigure}
@@ -231,6 +231,10 @@ Leslie L.: Specifying Systems: The TLA+ Language and Tools for Hardware and Soft
 Intel Corporation: Using TLA+ to Design and Verify a Cache Coherence Protocol. Intel Corporation, 2008
 \url{https://lamport.azurewebsites.net/tla/industrial-use.html}
 
+% ToDo cambiar el nombre de esta bibl
+\bibitem{caso_de_estudio}
+Poner nombre 
+\url{https://github.com/Trundle/PlusCal/blob/master/progress/progress.tla}
 
 \end{thebibliography}
 \end{document}
