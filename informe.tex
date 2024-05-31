@@ -35,7 +35,7 @@
 \begin{document}
 \title{TLA+ Proof System}
 \author{Anna Aimeri, Sebastián José Giraudo, Valentín Negrelli}
-\institute{Facultad de Matemática, Astronomía, Física y Computación, Av. Medina Allende s/n, Córdoba, Argentina}
+\institute{FaMAF – UNC}
 \maketitle             
 \begin{abstract}
 Se presenta un set de herramientas sobre el lenguaje de especificación de modelos TLA+, que permite corregir el diseño de un sistema mediante la especificación de un modelo, y demostrar propiedades sobre sus comportamientos posibles mediante el uso de motores de prueba sobre lógica temporal de acciones. Se desarrollan características de la interfaz de usuario, el mecanismo de chequeo del modelo y especificaciones, junto a casos de aplicación en la industria por grandes tecnológicas, desde procesos de sistemas operativos en tiempo real hasta sistemas de almacenamiento distribuidos.
@@ -131,7 +131,7 @@ TLA+ se utiliza en Amazon Web Services (AWS) para corregir errores y mejorar la 
 Debido al gran volumen de procesos que se realizan en los servidores de AWS, garantizar un código con la menor cantidad de bugs posible es esencial. Aunque un bug pueda parecer poco probable y tener una probabilidad de ocurrencia muy baja, la enorme cantidad de transacciones que se realizan diariamente hace que incluso estos casos poco probables puedan surgir. Es por esto que la capacidad de TLA+ para detectar y corregir incluso los errores más sutiles se vuelve crítica en un entorno donde la fiabilidad y la precisión son imperativas.\cite{amazon}
 
 \paragraph{Prueba de un algoritmo tolerante a demoras y fallas de renombre de procesos}
-En el marco de la computación paralela, se ha realizado un trabajo de análisis y verificación de un algoritmo no bloqueante y tolerante a fallas de renombre de procesos en un sistema de memoria compartido. Esto permite probar propiedades de safety y liveness sobre el sistema. En particular, se probó una propiedad que indica que cada proceso nombrado obtiene un nombre único, y otra que muestra que cada proceso que entra al sistema obtiene un nombre eventualmente. Se realizaron, además, las pruebas pertinentes de corrección y completitud de los $splitters$, objetos que se utilizan para la sincronización de acciones sin bloqueo, que cumplen la función de mapear cada proceso con su nombre. Estas pruebas mostraban que, partiendo de un estado inicial, los procesos son dirigidos en alguna dirección, llamándoles $derecha$ o $abajo$, con strong fairness en ambas, y que sólo se tiene un proceso asignado al nombre de ese splitter (pensado como proceso con dirección $stop$), y, finalmente, que cada proceso que entra al splitter es direccionado a alguna de estas categorías eventualmente.
+En el marco de la computación paralela, se ha realizado un trabajo de análisis y verificación de un algoritmo no bloqueante y tolerante a fallas de renombre de procesos en un sistema de memoria compartido. Esto permite probar propiedades de safety y liveness sobre el sistema. En particular, se probó una propiedad que indica que cada proceso nombrado obtiene un nombre único, y otra que muestra que cada proceso que entra al sistema obtiene un nombre eventualmente. Se realizaron, además, las pruebas pertinentes de corrección y completitud de los $splitters$, objetos que se utilizan para la sincronización de acciones sin bloqueo, que cumplen la función de mapear cada proceso con su nombre. Estas pruebas mostraban que, partiendo de un estado inicial, los procesos son dirigidos en alguna dirección, llamándoles $derecha$ o $abajo$, con strong fairness en ambas, y que sólo se tiene un proceso asignado al nombre de ese splitter (pensado como proceso con dirección $stop$), y, finalmente, que cada proceso que entra al splitter es direccionado a alguna de estas categorías eventualmente.\cite{renaming}
 
 \section{Caso de aplicación de la herramienta}
 Se trata de un modelo de gestor de tareas, creado por el desarrollador Andreas Stührk. Este debe mantener actualizado el estado de realización de los trabajos encomendados, y asegurarse de que esto se gestione de manera concurrente. El sistema tenía un bug de consistencia en el supervisor de trabajos, y es que a veces no se percibía el cambio de ‘pendiente’ a ‘completo’. Entonces, desarrolló la especificación de las partes del sistema existente con TLA+, apoyándose también en el lenguaje de pseudocódigo asociado PlusCal, y chequeando invariantes de correctitud y progreso con TLC.
@@ -173,10 +173,10 @@ end process;
 
 donde $unacked$ lleva la cuenta de mensajes procesándose por el supervisor, $switchHappened$ la cantidad de veces que se cambia el estado de ‘pendiente’ a ‘completo’ de un trabajo, y $queue$ la cola de mensajes con tareas completas por las unidades de procesamiento. El código completo de especificación se puede ver en 
 \cite{caso_de_estudio}.
-% ToDo cambiar el nombre de esa cita en la bibliografia
 
-Podemos entonces definir las propiedades a verificar en el modelo. En primer lugar, el invariante de correctitud, que asegure que o bien quedan tareas aún no procesadas como completas (cola no vacía), o bien el manejador está procesando un mensaje de status (\(unacked > 0\)), o bien ya se ha completado el trabajo y se puede visualizar en el supervisor (\(switchHappened > 0\)). Definimos además, la propiedad de progreso esperada, que denote que el supervisor cambia de estado eventualmente.
-\begin{wrapfigure}[5]{l}{6.5cm}
+% ToDo cambiar el nombre de esa cita en la bibliografia
+\begin{wrapfigure}[7]{r}{6.25cm}
+\vspace{-0.5cm}
 \begin{lstlisting}
 Correctness == \/ queue # <<>>
                  \/ unacked > 0
@@ -184,10 +184,12 @@ Correctness == \/ queue # <<>>
 Liveness == <>[](switchHappened > 0)
 \end{lstlisting}
 \end{wrapfigure}
+Podemos entonces definir las propiedades a verificar en el modelo. En primer lugar, el invariante de correctitud, que asegure que o bien quedan tareas aún no procesadas como completas (cola no vacía), o bien el manejador está procesando un mensaje de status (\(unacked > 0\)), o bien ya se ha completado el trabajo y se puede visualizar en el supervisor (\(switchHappened > 0\)). Definimos además, la propiedad de progreso esperada, que denote que el supervisor cambia de estado eventualmente.
 
 Esta especificación logró poner en evidencia el error. En el diseño del sistema se puede demostrar que es necesario hacer lecturas y escrituras por quórum en los nodos de Cassandra, indicando que la lectura de un único nodo no es confiable, ya que este puede no haber sido actualizado por algún interleaving con otra lectura del proceso. Al analizar más profundamente, se descubrió que en la implementación real las lecturas de la base de datos no usaban niveles de consistencia de quórum correctamente.
 
 El código usa Java con la librería Datastax Cassandra Driver statements con el siguiente formato para las consultas a la base de datos.
+
 % \begin{wrapfigure}{l}{8.5cm}
 \begin{lstlisting}[language=Java]
 Statement insert = QueryBuilder
@@ -213,13 +215,9 @@ Por otra parte, es posible ver una limitación en el diseño, ya que no puede pr
 
 \section{Conclusiones}
 
-TLA+ es accesible para aquellos con conocimientos básicos en lógica y teoría de conjuntos. Tiene una sintaxis que simula la matemática clásica, y el model checker tiene un funcionamiento muy similar a otros del mismo nivel de expresividad. TLAPS puede resultar más complejo de manejar que TLA+, ya que hay que definir el contexto adecuado de prueba de un teorema, lo cual puede requerir de un esfuerzo considerable, sobre todo si no se tiene una idea de la validez del diseño desde el principio. 
+En el presente trabajo se analizó la herramienta TLA+, accesible para aquellos con conocimientos básicos en lógica y teoría de conjuntos. Con una sintaxis que simula la matemática clásica, su verificador de modelos TLC presenta una interfaz amigable y fácil de instalar y aprender, permitiendo a los usuarios verificar propiedades de sus especificaciones pudiendo abstraerse de los detalles de implementación. TLAPS, por su parte, puede representar una mayor complejidad a la hora de definir el contexto de prueba de un teorema, pero ofrece una mayor capacidad de verificación de propiedades si se cuenta con un diseño sólido desde el principio.
 
-La instalación de TLA+ y sus herramientas asociadas es generalmente sencilla y bien documentada.
-
-TLA+ puede verificar programas de diversos tipos, demostrando su versatilidad y adaptabilidad a diferentes contextos y necesidades en el desarrollo de sistemas.
-
-En general, las herramientas de TLA+ pueden ser muy útiles para la corrección de diseño. Según la experiencia de expertos, estas herramientas han probado ser efectivas en la identificación de bugs que podrían haber pasado desapercibidos con métodos de testing convencionales.Se trata de herramientas poderosas que, a pesar de su potencial complejidad inicial en ciertos aspectos, se presentan como herramientas altamente recomendables para aquellos involucrados en el diseño y verificación de sistemas, debido a su capacidad para mejorar la calidad y fiabilidad de los sistemas desarrollados.
+En general, las herramientas de TLA+ proveen un entorno fértil para la corrección del diseño de un sistema. Estas herramientas han probado ser efectivas en la identificación de bugs que podrían haber pasado desapercibidos con métodos de testing convencionales. Aplicadas en numerosos programas de diversos tipos, demuestran su versatilidad y adaptabilidad a diferentes contextos y necesidades en el entorno de desarrollo de sistemas. Se trata de herramientas poderosas que, incluso con sus desafíos y limitaciones, resultan de gran utilidad para quienes trabajan en el diseño y verificación de programas, permitiendo mejorar la calidad y fiabilidad de los sistemas desarrollados.
 
 \begin{thebibliography}{8}
 \bibitem{wiki}
@@ -244,15 +242,15 @@ Chris N., Tim R., Fan Z., Bogdan M., Marc B., Michael D.: Use of Formal Methods 
 Leslie L.: Specifying Systems: The TLA+ Language and Tools for Hardware and Software Engineers. Addison-Wesley Professional, 2002
 
 \bibitem{intel}
-Intel Corporation: Using TLA+ to Design and Verify a Cache Coherence Protocol. Intel Corporation, 2008
+Intel Corporation: Using TLA+ to Design and Verify a Cache Coherence Protocol. Intel Corporation, 2008,
 \url{https://lamport.azurewebsites.net/tla/industrial-use.html}
 
 \bibitem{caso_de_estudio}
-Especificación de un supervisor de trabajos
+Especificación de un supervisor de trabajos,
 \url{https://github.com/Trundle/PlusCal/blob/master/progress/progress.tla}
 
 \bibitem{renaming}
-Renaming Fault-Tolerant Non-Blocking Algorithm
+Renaming Fault-Tolerant Non-Blocking Algorithm,
 \url{https://hal.science/hal-02442015}
 \end{thebibliography}
 \end{document}
