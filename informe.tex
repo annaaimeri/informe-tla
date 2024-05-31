@@ -54,9 +54,9 @@ TLA+ se encuentra en un estado de continuo desarrollo y expansión. Aunque la he
 
 TLA+ es un lenguaje de especificación formal multi-propósito particularmente útil para describir sistemas distribuidos y concurrentes. Se trata de un lenguaje declarativo, jerárquico, y escalable a especificaciones de grandes sistemas, que provee una abstracción consistente sobre varios motores de prueba como backend.
 
-Las propiedades que TLA+ puede chequear son condiciones sobre ejecuciones individuales. Además, permite verificar invariantes sobre comportamientos válidos tales como algunas propiedades de lógica temporal básica que respondan a características de safety y liveness, pudiendo asumir condiciones sobre acciones como weak fairness o strong fairness.
+Las propiedades que el set de herramientas de TLA+ puede chequear son condiciones sobre ejecuciones individuales. Además, permite verificar invariantes sobre comportamientos válidos tales como algunas propiedades de lógica temporal básica que respondan a características de safety y liveness, pudiendo asumir condiciones sobre acciones como weak fairness o strong fairness.
 
-Dado que el objetivo de la herramienta es especificar propiedades sobre las variables libres del modelo, es utilizado principalmente en la etapa de arquitectura y diseño del software, una vez que se cuenta con la especificación y antes de codificar la implementación. A su vez, es posible apoyarse en la herramienta para derivar casos de tests, dado que un diseño certero del modelo nos provee el conjunto de propiedades a verificar para nuestra implementación.
+Dado que el objetivo de las herramientas es especificar propiedades sobre las variables libres del modelo, son utilizadas principalmente en la etapa de arquitectura y diseño del software, una vez que se cuenta con la especificación y antes de codificar la implementación. A su vez, es posible apoyarse en la especificación para derivar casos de tests, dado que un diseño certero del modelo nos provee el conjunto de propiedades a verificar para nuestra implementación.
 
 \section{Descripción del lado del usuario}
 El entorno de desarrollo integrado (IDE) para las herramientas de TLA+ es TLA Toolbox, y puede utilizarse para diseñar las especificaciones, correr el model checker (TLC) y el TLA Proof System (TLAPS). Además, es posible correr el model checker vía línea de comandos o a través de una extensión para Visual Studio Code, que cuenta con las funcionalidades básicas del IDE.
@@ -66,15 +66,35 @@ El lenguaje de especificación de modelos TLA+ es un lenguaje formal que combina
 El lenguaje de propiedades de TLA+ se basa en la lógica de acciones temporales (TLA). Esta lógica combina la lógica temporal con una lógica de acciones, proporcionando constructores que incluyen predicados sobre estados iniciales, relaciones de transición entre estados sucesivos y condiciones de fairness para garantizar un progreso adecuado en el sistema.
 
 Las especificaciones en TLA+ suelen tener el siguiente formato:
-
-\begin{figure}
-    \includegraphics[width=6cm]{tla.png}
-    \includegraphics[width=6cm]{tlaps.png}
-\end{figure}
-
+%
+\[
+\begin{array}{cc}
+\begin{scriptsize}
+\begin{aligned}
+    & Action_1 \triangleq \land_{i=1}^{m_1} Pre_i \land_{i=1}^{k_1} Next_i \\
+    & \dots \\
+    & Action_n \triangleq \land_{i=1}^{m_n} Pre_i \land_{i=1}^{k_n} Next_i \\
+    & Init \triangleq \land_{i=1}^{m_i} P_{var_i} \\
+    & Next \triangleq \lor_{i=1}^{n} Action_i \\
+    & Spec \triangleq Init \land \square [Next]{\langle vars \rangle} \land WF{\langle vars \rangle}(Action)
+\end{aligned}
+\end{scriptsize}
+&
+\begin{scriptsize}
+\begin{aligned}
+    & THEOREM\ ValidProperty \triangleq \\
+    & \phantom{THE} Spec \implies Property \\
+    & \langle 1 \rangle1. Init \implies Property \\
+    & \langle 1 \rangle2. Property \land [Next]_{\langle vars \rangle} \implies Property \\
+    & \langle 1 \rangle3. QED\ BY\ \langle 1 \rangle1, \langle 1 \rangle2,\ PTL\ DEF\ Spec
+\end{aligned}
+\end{scriptsize}
+\end{array}
+\]
+%
 $Action_{i}$ representa una acción, que se puede expresar como una conjunción de precondiciones y postcondiciones, donde la postcondición en general usa el valor de una variable en el próximo estado para describir la acción que se puede realizar dadas las precondiciones. \textit{Init} es el predicado de estado inicial, \textit{Next} es el predicado del siguiente estado válido, y \textit{Spec} es la especificación completa del sistema, que incluye el estado inicial, la relación de transición y condiciones de fairness, que puede ser débil o fuerte. Dada una acción A, la condición de fairness débil \textit{WF(A)} asegura que si A es habilitada permanentemente a partir de un estado, i.e. se cumplen las precondiciones de A, entonces A se ejecutará infinitas veces. La condición de fairness fuerte \textit{SF(A)} asegura que si A es habilitada frecuentemente a lo largo de una traza de estados, entonces A se ejecutará infinitas veces. El subíndice $\langle vars \rangle$ en \textit{Next} indican que puede darse que ninguna de esas variables cambien en un estado, y en las propiedades de fairness significa que el progreso debe darse para todas las variables del conjunto. 
 
-Además, es posible con TLA+ formular teoremas y diseñar pruebas formales sobre propiedades de estas especificaciones en TLAPS. Un caso general puede enunciarse de la forma de arriba, donde definimos un teorema que permite probar Property a partir de la especificación, asistiendo la demostración con el contexto necesario para los motores de prueba, como la definición de Spec y propiedades básicas de lógica temporal proposicional.
+Además, es posible con TLA+ formular teoremas y diseñar pruebas formales sobre propiedades de estas especificaciones en TLAPS. Un caso general puede enunciarse de la forma de arriba, donde definimos un teorema que permite probar Property a partir de la especificación, asistiendo la demostración con el contexto necesario para los motores de prueba, como la definición de $Spec$ y propiedades básicas de lógica temporal proposicional.
 
 Los modelos en TLA+ y su verificación en TLC ponen su foco en el comportamiento del sistema, abstrayéndose de los detalles de su implementación. Es por esto que son independientes de cualquier lenguaje de programación, y no es necesario anotar el programa. Sin embargo, es posible anotar el algoritmo usando el pseudo-código PlusCal, un lenguaje formal que se transpila a TLA+, para probar propiedades sobre sus variables. A diferencia del enfoque orientado a acciones, PlusCal se asemeja más a un lenguaje de programación imperativo y es más adecuado para especificar algoritmos secuenciales.
 
@@ -111,7 +131,7 @@ TLA+ se utiliza en Amazon Web Services (AWS) para corregir errores y mejorar la 
 Debido al gran volumen de procesos que se realizan en los servidores de AWS, garantizar un código con la menor cantidad de bugs posible es esencial. Aunque un bug pueda parecer poco probable y tener una probabilidad de ocurrencia muy baja, la enorme cantidad de transacciones que se realizan diariamente hace que incluso estos casos poco probables puedan surgir. Es por esto que la capacidad de TLA+ para detectar y corregir incluso los errores más sutiles se vuelve crítica en un entorno donde la fiabilidad y la precisión son imperativas.\cite{amazon}
 
 \paragraph{Prueba de un algoritmo tolerante a demoras y fallas de renombre de procesos}
-En el marco de la computación paralela, se ha realizado un trabajo de análisis y verificación de un algoritmo no bloqueante y tolerante a fallas de renombre de procesos en un sistema de memoria compartido. Esto permite probar propiedades de safety y liveness sobre el sistema. En particular, se probó una propiedad que indica que cada proceso obtiene un nombre único, y otra que muestra que cada proceso que entra al sistema obtiene un nombre. Se realizaron, además, las pruebas pertinentes de corrección y completitud de los splitters, objetos que se utilizan para la sincronización de acciones sin bloqueo. Estas pruebas mostraban que los procesos son dirigidos en alguna dirección, derecha y abajo, con fairness en ambas, que solo se tiene un proceso asignado al nombre de ese splitter, y, finalmente, que cada proceso que entra al splitter es direccionado a alguna de estas categorias eventualmente.
+En el marco de la computación paralela, se ha realizado un trabajo de análisis y verificación de un algoritmo no bloqueante y tolerante a fallas de renombre de procesos en un sistema de memoria compartido. Esto permite probar propiedades de safety y liveness sobre el sistema. En particular, se probó una propiedad que indica que cada proceso nombrado obtiene un nombre único, y otra que muestra que cada proceso que entra al sistema obtiene un nombre eventualmente. Se realizaron, además, las pruebas pertinentes de corrección y completitud de los $splitters$, objetos que se utilizan para la sincronización de acciones sin bloqueo, que cumplen la función de mapear cada proceso con su nombre. Estas pruebas mostraban que, partiendo de un estado inicial, los procesos son dirigidos en alguna dirección, llamándoles $derecha$ o $abajo$, con strong fairness en ambas, y que sólo se tiene un proceso asignado al nombre de ese splitter (pensado como proceso con dirección $stop$), y, finalmente, que cada proceso que entra al splitter es direccionado a alguna de estas categorías eventualmente.
 
 \section{Caso de aplicación de la herramienta}
 Se trata de un modelo de gestor de tareas, creado por el desarrollador Andreas Stührk. Este debe mantener actualizado el estado de realización de los trabajos encomendados, y asegurarse de que esto se gestione de manera concurrente. El sistema tenía un bug de consistencia en el supervisor de trabajos, y es que a veces no se percibía el cambio de ‘pendiente’ a ‘completo’. Entonces, desarrolló la especificación de las partes del sistema existente con TLA+, apoyándose también en el lenguaje de pseudocódigo asociado PlusCal, y chequeando invariantes de correctitud y progreso con TLC.
@@ -151,7 +171,7 @@ begin P0:
 end process;    
 \end{lstlisting}
 
-donde $unacked$ lleva la cuenta de mensajes procesandose por el supervisor, $switchHappened$ la cantidad de veces que se cambia el estado de ‘pendiente’ a ‘completo’ de un trabajo, y $queue$ la cola de mensajes con tareas completas por las unidades de procesamiento. El código completo de especificación se puede ver en 
+donde $unacked$ lleva la cuenta de mensajes procesándose por el supervisor, $switchHappened$ la cantidad de veces que se cambia el estado de ‘pendiente’ a ‘completo’ de un trabajo, y $queue$ la cola de mensajes con tareas completas por las unidades de procesamiento. El código completo de especificación se puede ver en 
 \cite{caso_de_estudio}.
 % ToDo cambiar el nombre de esa cita en la bibliografia
 
@@ -167,7 +187,7 @@ Liveness == <>[](switchHappened > 0)
 
 Esta especificación logró poner en evidencia el error. En el diseño del sistema se puede demostrar que es necesario hacer lecturas y escrituras por quórum en los nodos de Cassandra, indicando que la lectura de un único nodo no es confiable, ya que este puede no haber sido actualizado por algún interleaving con otra lectura del proceso. Al analizar más profundamente, se descubrió que en la implementación real las lecturas de la base de datos no usaban niveles de consistencia de quórum correctamente.
 
-El código usa Java con la librería Datastax Cassandra Driver statements con el siguiente formato:
+El código usa Java con la librería Datastax Cassandra Driver statements con el siguiente formato para las consultas a la base de datos.
 % \begin{wrapfigure}{l}{8.5cm}
 \begin{lstlisting}[language=Java]
 Statement insert = QueryBuilder
@@ -189,21 +209,17 @@ return session
 .setConsistencyLevel(consistencyLevel);
 \end{lstlisting}
 
-Por otra parte, es posible ver una limitación en el diseño, ya que no puede probarse la propiedad que especifica que el cambio de estado de ‘pendiente’ a ‘completo’ se observa a lo sumo una vez $NoDupSwitch == switchHappened <= 1$, implicando el riesgo de reportar como completado más de una vez un trabajo.
+Por otra parte, es posible ver una limitación en el diseño, ya que no puede probarse la propiedad que especifica que el cambio de estado de ‘pendiente’ a ‘completo’ se observa a lo sumo una vez: $NoDupSwitch == switchHappened <= 1$, implicando el riesgo de reportar como completado más de una vez un trabajo.
 
 \section{Conclusiones}
 
-TLA+ es accesible para aquellos con conocimientos básicos en lógica y teoría de conjuntos. Tiene una sintaxis que simula la matemática clásica, y el model checker tiene un funcionamiento muy similar a otros del mismo nivel de expresividad.
-
-TLAPS puede resultar más complejo de manjear que TLA+, ya que hay que definir el contexto adecuado de prueba de un teorema, lo cual puede requerir de un esfuerzo considerable, sobre todo si no se tiene una idea de la validez del diseño desde el principio. 
+TLA+ es accesible para aquellos con conocimientos básicos en lógica y teoría de conjuntos. Tiene una sintaxis que simula la matemática clásica, y el model checker tiene un funcionamiento muy similar a otros del mismo nivel de expresividad. TLAPS puede resultar más complejo de manejar que TLA+, ya que hay que definir el contexto adecuado de prueba de un teorema, lo cual puede requerir de un esfuerzo considerable, sobre todo si no se tiene una idea de la validez del diseño desde el principio. 
 
 La instalación de TLA+ y sus herramientas asociadas es generalmente sencilla y bien documentada.
 
-Las herramientas de TLA+ pueden ser muy útiles para la corrección de diseño (tendo dudas acá). Según la experiencia de expertos, estas herramientas han sido efectivas en la identificación de bugs que podrían haber pasado desapercibidos con métodos de testing convencionales.
-
 TLA+ puede verificar programas de diversos tipos, demostrando su versatilidad y adaptabilidad a diferentes contextos y necesidades en el desarrollo de sistemas.
 
-En general, TLA+ y TLAPS son herramientas poderosas que, a pesar de su potencial complejidad inicial en ciertos aspectos, se presentan como una herramientas altamente recomendables para aquellos involucrados en el diseño y verificación de sistemas, debido a su capacidad para mejorar la calidad y fiabilidad de los sistemas desarrollados. 
+En general, las herramientas de TLA+ pueden ser muy útiles para la corrección de diseño. Según la experiencia de expertos, estas herramientas han probado ser efectivas en la identificación de bugs que podrían haber pasado desapercibidos con métodos de testing convencionales.Se trata de herramientas poderosas que, a pesar de su potencial complejidad inicial en ciertos aspectos, se presentan como herramientas altamente recomendables para aquellos involucrados en el diseño y verificación de sistemas, debido a su capacidad para mejorar la calidad y fiabilidad de los sistemas desarrollados.
 
 \begin{thebibliography}{8}
 \bibitem{wiki}
