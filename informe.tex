@@ -52,7 +52,7 @@ El desarrollo de TLA+ fue una evolución natural de TLA, formalizándose complet
 
 TLA+ se encuentra en un estado de continuo desarrollo y expansión. Aunque la herramienta está diseñada principalmente para ingenieros de software y profesionales con conocimientos en lógica y teoría de conjuntos, su uso en la industria es prominente. Sin embargo, algunas características del lenguaje de especificación tienen soporte limitado, y se está trabajando en una extensión para soportarlas completamente. La investigación actual sobre un verificador de modelos más avanzado para TLA+ busca continuar este progreso, proporcionando a los ingenieros herramientas aún más poderosas para la especificación y verificación de sistemas.
 
-TLA+ es un lenguaje de especificación formal multi-propósito particularmente útil para describir sistemas distribuidos y concurrentes. Se trata de un lenguaje declarativo, jerárquico, y escalable a especificaciones de grandes sistemas, que provee una abstracción consistente sobre varios motores de prueba como backend.
+TLA+ es un lenguaje de especificación formal multi-propósito particularmente útil para describir sistemas distribuidos y concurrentes. Se trata de un lenguaje declarativo, jerárquico, y escalable a especificaciones de grandes sistemas, que provee una abstracción consistente sobre varios motores de prueba como backend, i.e. se puede usar la misma especificación para probar propiedades sobre diferentes motores.
 
 Las propiedades que el set de herramientas de TLA+ puede chequear son condiciones sobre ejecuciones individuales. Además, permite verificar invariantes sobre comportamientos válidos tales como algunas propiedades de lógica temporal básica que respondan a características de safety y liveness, pudiendo asumir condiciones sobre acciones como weak fairness o strong fairness.
 
@@ -96,7 +96,7 @@ $Action_{i}$ representa una acción, que se puede expresar como una conjunción 
 
 Además, es posible con TLA+ formular teoremas y diseñar pruebas formales sobre propiedades de estas especificaciones en TLAPS. Un caso general puede enunciarse de la forma de arriba, donde definimos un teorema que permite probar Property a partir de la especificación, asistiendo la demostración con el contexto necesario para los motores de prueba, como la definición de $Spec$ y propiedades básicas de lógica temporal proposicional.
 
-Los modelos en TLA+ y su verificación en TLC ponen su foco en el comportamiento del sistema, abstrayéndose de los detalles de su implementación. Es por esto que son independientes de cualquier lenguaje de programación, y no es necesario anotar el programa. Sin embargo, es posible anotar el algoritmo usando el pseudo-código PlusCal, un lenguaje formal que se transpila a TLA+, para probar propiedades sobre sus variables. A diferencia del enfoque orientado a acciones, PlusCal se asemeja más a un lenguaje de programación imperativo y es más adecuado para especificar algoritmos secuenciales.
+Los modelos en TLA+ y su verificación en TLC ponen su foco en el comportamiento del sistema, abstrayéndose de los detalles de su implementación. Es por esto que son independientes de cualquier lenguaje de programación, y no es necesario anotar el programa. Sin embargo, es posible anotar el algoritmo usando el pseudo-código PlusCal, un lenguaje formal que se transpila a TLA+, para probar propiedades sobre sus variables. A diferencia del enfoque orientado a acciones, PlusCal se asemeja más a un lenguaje de programación imperativo y es más adecuado para especificar algoritmos secuenciales, ya que cuenta con sintaxis para definir asignaciones, secuenciaciones, condicionales y bucles.
 
 TLC visualiza los errores en las especificaciones de TLA+ proporcionando informes detallados cuando encuentra la violación de alguna propiedad. Cuando TLC detecta que una de las propiedades que está verificando no se cumple, procede a reportar un contraejemplo que ilustra cómo el sistema llega a un estado en el que esa propiedad es violada, a partir de un comportamiento válido segun la especificación. A continuación, TLC genera una traza que lleva al estado donde se produce la violación, representando cada estado como un predicado TLA+ que describe sus condiciones, y permite visualizar la evolución del sistema hasta llegar al estado problemático. Esta traza se minimiza para ofrecer una representación concisa pero informativa del problema. 
 
@@ -212,6 +212,9 @@ return session
 
 Por otra parte, es posible ver una limitación en el diseño, ya que no puede probarse la propiedad que especifica que el cambio de estado de ‘pendiente’ a ‘completo’ se observa a lo sumo una vez: $NoDupSwitch == switchHappened <= 1$, implicando el riesgo de reportar como completado más de una vez un trabajo.
 
+\section{Comparación con otras herramientas}
+El set de herramientas de TLA+ provee una funcionalidad muy similar a otros model checkers y verificadores de sistemas desarrollados. Alguna de las cosas por las que más se destaca es por su nivel de expresividad, superando la lógica relacional de primer orden a la que está limitada Alloy, a nivel de especificar propiedades sobre conjuntos de conjuntos y estructuras de datos recursivas\cite{alloy}. Además las herramientas de TLA+ ofrecen interfaces igual de amigables que otras herramientas de model checking como SPIN, cuya comparación se encuentra muy detallada en el desarrollo del diseño de un sistema RTOS\cite{RTOS}, en el que se eligió a las herramientas de TLA+ principalmente por su expresividad, comprensibilidad y reusabilidad. 
+
 \section{Conclusiones}
 
 
@@ -252,5 +255,13 @@ Especificación de un supervisor de trabajos,
 \bibitem{renaming}
 Renaming Fault-Tolerant Non-Blocking Algorithm,
 \url{https://hal.science/hal-02442015}
+
+\bibitem{alloy}
+\url{https://hpts.ws/papers/2011/sessions_2011/Debugging.pdf}
+
+\bibitem{RTOS}
+Eric Verhulst, Raymond Boute, José Faria,
+Bernhard H. C. Sputh, Vitaliy Mezhuyev, 2010, Formal Development of a Network-Centric RTOS, Springer
+\url{https://link.springer.com/book/10.1007/978-1-4419-9736-4}
 \end{thebibliography}
 \end{document}
